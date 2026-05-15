@@ -1,0 +1,52 @@
+@model List<NexusGear.Models.Category>
+@{
+    ViewData["Title"] = "Categories";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <p style="color:var(--text-muted);font-size:0.85rem;margin:0;">@Model.Count categories total</p>
+    <a href="/Admin/Categories/Create" class="btn-nexus btn-nexus-sm"><i class="fas fa-plus me-1"></i>Add Category</a>
+</div>
+
+<div class="glass-card">
+    <div class="table-responsive">
+        <table class="nexus-table">
+            <thead>
+                <tr><th>Image</th><th>Name</th><th>Slug</th><th>Products</th><th>Order</th><th>Status</th><th>Actions</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var cat in Model)
+                {
+                    <tr>
+                        <td>
+                            <img src="@(cat.ImageUrl ?? "https://placehold.co/50x50/150020/a855f7?text=?")"
+                                 style="width:48px;height:48px;object-fit:cover;border-radius:6px;"
+                                 onerror="this.src='https://placehold.co/50x50/150020/a855f7?text=?'" />
+                        </td>
+                        <td><strong style="color:var(--text-primary);">@cat.Name</strong></td>
+                        <td><span style="color:var(--text-muted);font-size:0.82rem;">@cat.Slug</span></td>
+                        <td>@cat.Products.Count(p => p.IsActive)</td>
+                        <td>@cat.DisplayOrder</td>
+                        <td>
+                            @if (cat.IsActive) {
+                                <span style="background:rgba(16,185,129,0.12);color:var(--success);font-size:0.7rem;padding:2px 8px;border-radius:20px;font-weight:600;">Active</span>
+                            } else {
+                                <span style="background:rgba(239,68,68,0.12);color:var(--danger);font-size:0.7rem;padding:2px 8px;border-radius:20px;font-weight:600;">Inactive</span>
+                            }
+                        </td>
+                        <td>
+                            <div class="d-flex gap-1">
+                                <a href="/Admin/Categories/Edit/@cat.Id" class="btn-nexus-outline btn-nexus-sm"><i class="fas fa-edit"></i></a>
+                                <form asp-action="Delete" method="post" class="d-inline" onsubmit="return confirm('Remove this category?')">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@cat.Id" />
+                                    <button type="submit" class="btn-danger-nx"><i class="fas fa-trash"></i></button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

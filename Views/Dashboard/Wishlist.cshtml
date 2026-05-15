@@ -1,0 +1,74 @@
+@model List<NexusGear.Models.WishlistItem>
+@{
+    ViewData["Title"] = "Wishlist - NexusGear";
+}
+
+<div class="container py-5">
+    <nav aria-label="breadcrumb" class="mb-4"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="/">Home</a></li><li class="breadcrumb-item"><a href="/Dashboard">Dashboard</a></li><li class="breadcrumb-item active">Wishlist</li></ol></nav>
+    <h1 style="font-family:'Orbitron',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:2rem;">My Wishlist <span style="color:var(--secondary);">(@Model.Count)</span></h1>
+
+    @if (!Model.Any())
+    {
+        <div class="empty-state">
+            <i class="fas fa-heart-broken"></i>
+            <h4>Your wishlist is empty</h4>
+            <p>Save items you love to your wishlist</p>
+            <a href="/Shop" class="btn-nexus btn-nexus-sm mt-2">Browse Shop</a>
+        </div>
+    }
+    else
+    {
+        <div class="row g-3">
+            @foreach (var item in Model)
+            {
+                if (item.Product == null) continue;
+                var p = item.Product;
+                string fallback = $"https://placehold.co/300x250/150020/a855f7?text={Uri.EscapeDataString(p.Name)}";
+                <div class="col-6 col-md-4 col-lg-3" id="wishlistItem_@item.Id">
+                    <div class="product-card @(p.IsOutOfStock ? "out-of-stock" : "")">
+                        <div class="product-card-img-wrap">
+                            <a href="/shop/@p.Slug">
+                                <img src="@(p.ImageUrl ?? fallback)" alt="@p.Name" onerror="this.src='@fallback'" />
+                            </a>
+                            @if (p.IsOutOfStock) { <div class="out-of-stock-overlay"><span class="out-of-stock-text">OUT OF STOCK</span></div> }
+                            @if (p.DiscountPercentage > 0) { <div class="discount-ribbon">-@p.DiscountPercentage.ToString("0")%</div> }
+                        </div>
+                        <div class="product-card-body">
+                            @if (!string.IsNullOrEmpty(p.Brand)) { <p class="product-brand">@p.Brand</p> }
+                            <a href="/shop/@p.Slug" class="text-decoration-none"><p class="product-name">@p.Name</p></a>
+                            <div class="price-wrap">
+                                @if (p.DiscountPercentage > 0) {
+                                    <span class="price-original">$@p.Price.ToString("0.00")</span>
+                                    <span class="price-current">$@p.DiscountedPrice.ToString("0.00")</span>
+                                } else {
+                                    <span class="price-current">$@p.Price.ToString("0.00")</span>
+                                }
+                            </div>
+                        </div>
+                        <div class="product-card-actions">
+                            <button class="btn-cart" onclick="addToCart(@p.Id,1,this)" @(p.IsOutOfStock ? "disabled" : "")>
+                                <i class="fas fa-cart-plus"></i> @(p.IsOutOfStock ? "Out of Stock" : "Add to Cart")
+                            </button>
+                            <button class="btn-wishlist active" onclick="removeFromWishlistPage(@p.Id, @item.Id, this)" title="Remove from Wishlist">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+@Html.AntiForgeryToken()
+
+@section Scripts {
+    <script>
+        function removeFromWishlistPage(productId, wishlistItemId, btn) {
+            toggleWishlist(productId, btn);
+            setTimeout(() => {
+                const row = document.getElementById('wishlistItem_' + wishlistItemId);
+                if (row) { row.style.opacity = '0'; setTimeout(() => row.remove(), 300); }
+            }, 500);
+        }
+    </script>
+}

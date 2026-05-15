@@ -1,0 +1,66 @@
+@model NexusGear.ViewModels.RegisterViewModel
+@{
+    ViewData["Title"] = "Register - NexusGear";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div style="min-height:80vh;display:flex;align-items:center;justify-content:center;padding:3rem 1rem;background:radial-gradient(ellipse at 50% 0%, rgba(236,72,153,0.07) 0%, transparent 60%);">
+    <div class="auth-card" style="max-width:480px;">
+        <div class="text-center mb-4">
+            <a href="/" style="font-family:'Orbitron',sans-serif;font-size:1.3rem;font-weight:900;background:linear-gradient(135deg,var(--primary),var(--secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-decoration:none;">NEXUSGEAR</a>
+            <h1 class="auth-title mt-3 mb-1">Create Account</h1>
+            <p style="color:var(--text-muted);font-size:0.85rem;">Join the NexusGear community</p>
+        </div>
+
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="nexus-alert nexus-alert-danger mb-3">
+                @foreach (var err in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <div>@err.ErrorMessage</div>
+                }
+            </div>
+        }
+
+        <form asp-action="Register" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="ReturnUrl" />
+
+            <div class="row g-3 mb-3">
+                <div class="col-6">
+                    <label class="nexus-label">First Name *</label>
+                    <input asp-for="FirstName" class="nexus-form-control" placeholder="John" />
+                    <span asp-validation-for="FirstName" class="field-validation-error"></span>
+                </div>
+                <div class="col-6">
+                    <label class="nexus-label">Last Name *</label>
+                    <input asp-for="LastName" class="nexus-form-control" placeholder="Doe" />
+                    <span asp-validation-for="LastName" class="field-validation-error"></span>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="nexus-label">Email Address *</label>
+                <input asp-for="Email" type="email" class="nexus-form-control" placeholder="your@email.com" />
+                <span asp-validation-for="Email" class="field-validation-error"></span>
+            </div>
+            <div class="mb-3">
+                <label class="nexus-label">Password *</label>
+                <input asp-for="Password" type="password" class="nexus-form-control" placeholder="Min 6 chars, 1 uppercase, 1 symbol" />
+                <span asp-validation-for="Password" class="field-validation-error"></span>
+            </div>
+            <div class="mb-4">
+                <label class="nexus-label">Confirm Password *</label>
+                <input asp-for="ConfirmPassword" type="password" class="nexus-form-control" placeholder="Repeat your password" />
+                <span asp-validation-for="ConfirmPassword" class="field-validation-error"></span>
+            </div>
+            <button type="submit" class="btn-nexus w-100" style="justify-content:center;padding:0.8rem;font-size:0.95rem;">
+                <i class="fas fa-user-plus me-2"></i>Create Account
+            </button>
+        </form>
+
+        <p class="text-center mt-4" style="font-size:0.85rem;color:var(--text-muted);">
+            Already have an account?
+            <a asp-action="Login" asp-route-returnUrl="@Model.ReturnUrl" style="color:var(--primary-light);font-weight:600;">Login</a>
+        </p>
+    </div>
+</div>

@@ -1,0 +1,143 @@
+@model NexusGear.ViewModels.CartViewModel
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<NexusGear.Models.ApplicationUser> SignInManager
+@{
+    ViewData["Title"] = "Cart - NexusGear";
+    bool isGuest = !SignInManager.IsSignedIn(User);
+}
+
+<div class="container py-5">
+    <div class="d-flex align-items-center gap-3 mb-4">
+        <nav aria-label="breadcrumb" class="mb-0">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="/">Home</a></li>
+                <li class="breadcrumb-item active">Shopping Cart</li>
+            </ol>
+        </nav>
+    </div>
+    <h1 style="font-family:'Orbitron',sans-serif;font-size:1.4rem;font-weight:800;margin-bottom:2rem;">
+        Shopping Cart <span style="color:var(--primary);">(@Model.ItemCount item@(Model.ItemCount == 1 ? "" : "s"))</span>
+    </h1>
+
+    @if (!Model.Items.Any())
+    {
+        <div class="empty-state py-5">
+            <i class="fas fa-shopping-bag"></i>
+            <h4>Your cart is empty</h4>
+            <p>Add some gear to get started</p>
+            <a href="/Shop" class="btn-nexus btn-nexus-sm mt-2"><i class="fas fa-store me-2"></i>Browse Shop</a>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            <!-- Cart Items -->
+            <div class="col-lg-8">
+                <div class="d-flex flex-column gap-3">
+                    @foreach (var item in Model.Items)
+                    {
+                        string fallback = $"https://placehold.co/120x120/150020/a855f7?text={Uri.EscapeDataString(item.Product?.Name ?? "Product")}";
+                        <div class="cart-item-row" id="cartRow_@item.Id" style="transition:opacity 0.3s;">
+                            <!-- Image -->
+                            <a href="/shop/@item.Product?.Slug">
+                                <img class="cart-item-img" src="@(item.Product?.ImageUrl ?? fallback)" alt="@item.Product?.Name"
+                                     onerror="this.src='@fallback'" />
+                            </a>
+
+                            <!-- Info -->
+                            <div class="flex-1 min-w-0">
+                                <p style="font-size:0.72rem;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--primary);margin:0;">@item.Product?.Brand</p>
+                                <a href="/shop/@item.Product?.Slug" class="text-decoration-none">
+                                    <p style="font-weight:700;color:var(--text-primary);margin:0.25rem 0;font-size:0.95rem;">@item.Product?.Name</p>
+                                </a>
+                                @if (item.Product?.DiscountPercentage > 0)
+                                {
+                                    <p style="margin:0;font-size:0.8rem;">
+                                        <span style="text-decoration:line-through;color:var(--text-muted);">$@item.Product.Price.ToString("0.00")</span>
+                                        <span style="color:var(--accent);font-weight:700;margin-left:6px;">$@item.Product.DiscountedPrice.ToString("0.00")</span>
+                                    </p>
+                                }
+                                else
+                                {
+                                    <p style="margin:0;font-size:0.88rem;color:var(--accent);font-weight:700;">$@item.Product?.Price.ToString("0.00")</p>
+                                }
+                            </div>
+
+                            <!-- Qty Controls -->
+                            <div class="qty-controls d-flex align-items-center gap-2">
+                                <button class="qty-btn qty-minus" data-item-id="@item.Id">
+                                    <i class="fas fa-minus" style="font-size:0.75rem;"></i>
+                                </button>
+                                <input type="number" class="qty-input" value="@item.Quantity" min="0" max="@item.Product?.Stock"
+                                       onchange="updateQty(@item.Id, this)" style="width:52px;" />
+                                <button class="qty-btn qty-plus" data-item-id="@item.Id">
+                                    <i class="fas fa-plus" style="font-size:0.75rem;"></i>
+                                </button>
+                            </div>
+
+                            <!-- Item Total -->
+                            <div class="text-end" style="min-width:80px;">
+                                <p style="font-family:'Orbitron',sans-serif;font-weight:700;color:var(--accent);margin:0;font-size:0.95rem;" id="itemTotal_@item.Id">
+                                    $@((item.Product?.DiscountedPrice * item.Quantity ?? 0).ToString("0.00"))
+                                </p>
+                            </div>
+
+                            <!-- Remove -->
+                            <button class="btn-danger-nx" onclick="removeFromCart(@item.Id)" title="Remove">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="col-lg-4">
+                <div class="order-summary-card">
+                    <h3 style="font-family:'Orbitron',sans-serif;font-size:0.92rem;font-weight:700;margin-bottom:1.25rem;color:var(--primary-light);">Order Summary</h3>
+
+                    <div class="summary-row">
+                        <span>Subtotal</span>
+                        <span id="summarySubtotal">$@Model.Subtotal.ToString("0.00")</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Shipping</span>
+                        <span id="summaryShipping" style="@(Model.ShippingCost == 0 ? "color:var(--success);" : "")">
+                            @(Model.ShippingCost == 0 ? "FREE" : "$" + Model.ShippingCost.ToString("0.00"))
+                        </span>
+                    </div>
+                    @if (Model.ShippingCost > 0)
+                    {
+                        <div class="summary-row" style="font-size:0.75rem;color:var(--text-muted);">
+                            <span>Add $@((50 - Model.Subtotal).ToString("0.00")) more for free shipping</span>
+                        </div>
+                    }
+                    <hr style="border-color:var(--border);margin:0.75rem 0;" />
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span style="font-weight:700;color:var(--text-primary);">Total</span>
+                        <span class="summary-total" id="summaryTotal">$@Model.Total.ToString("0.00")</span>
+                    </div>
+
+                    @if (isGuest)
+                    {
+                        <a href="/Account/Login?returnUrl=%2FCheckout" class="btn-nexus w-100 mt-4" style="justify-content:center;padding:0.85rem;">
+                            <i class="fas fa-sign-in-alt me-2"></i>Login to Checkout
+                        </a>
+                        <p style="font-size:0.78rem;color:var(--text-muted);text-align:center;margin-top:0.6rem;">Your cart is saved. Login or register to complete your order.</p>
+                    }
+                    else
+                    {
+                        <a href="/Checkout" class="btn-nexus w-100 mt-4" style="justify-content:center;padding:0.85rem;">
+                            <i class="fas fa-lock me-2"></i>Proceed to Checkout
+                        </a>
+                    }
+                    <a href="/Shop" class="btn-nexus-outline w-100 mt-2" style="justify-content:center;padding:0.7rem;">
+                        Continue Shopping
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@Html.AntiForgeryToken()

@@ -1,0 +1,62 @@
+@model NexusGear.ViewModels.LoginViewModel
+@{
+    ViewData["Title"] = "Login - NexusGear";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div style="min-height:80vh;display:flex;align-items:center;justify-content:center;padding:3rem 1rem;background:radial-gradient(ellipse at 50% 0%, rgba(168,85,247,0.08) 0%, transparent 60%);">
+    <div class="auth-card">
+        <div class="text-center mb-4">
+            <a href="/" style="font-family:'Orbitron',sans-serif;font-size:1.3rem;font-weight:900;background:linear-gradient(135deg,var(--primary),var(--secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-decoration:none;">NEXUSGEAR</a>
+            <h1 class="auth-title mt-3 mb-1">Welcome Back</h1>
+            <p style="color:var(--text-muted);font-size:0.85rem;">Login to access your account</p>
+        </div>
+
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="nexus-alert nexus-alert-danger mb-3">
+                @foreach (var err in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <div>@err.ErrorMessage</div>
+                }
+            </div>
+        }
+
+        <form asp-action="Login" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="ReturnUrl" />
+
+            <div class="mb-3">
+                <label class="nexus-label">Email Address</label>
+                <input asp-for="Email" type="email" class="nexus-form-control" placeholder="your@email.com" autofocus />
+                <span asp-validation-for="Email" class="field-validation-error"></span>
+            </div>
+            <div class="mb-4">
+                <label class="nexus-label">Password</label>
+                <input asp-for="Password" type="password" class="nexus-form-control" placeholder="••••••••" />
+                <span asp-validation-for="Password" class="field-validation-error"></span>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div class="form-check mb-0">
+                    <input asp-for="RememberMe" class="form-check-input" type="checkbox" />
+                    <label class="form-check-label nexus-label" asp-for="RememberMe" style="margin-bottom:0;cursor:pointer;">Remember me</label>
+                </div>
+                <a href="#" style="font-size:0.82rem;color:var(--primary-light);">Forgot password?</a>
+            </div>
+            <button type="submit" class="btn-nexus w-100" style="justify-content:center;padding:0.8rem;font-size:0.95rem;">
+                <i class="fas fa-sign-in-alt me-2"></i>Login
+            </button>
+        </form>
+
+        <p class="text-center mt-4" style="font-size:0.85rem;color:var(--text-muted);">
+            Don't have an account?
+            <a asp-action="Register" asp-route-returnUrl="@Model.ReturnUrl" style="color:var(--primary-light);font-weight:600;">Create one</a>
+        </p>
+
+        <div style="border-top:1px solid var(--border);margin-top:1.5rem;padding-top:1rem;text-align:center;">
+            <p style="font-size:0.75rem;color:var(--text-muted);margin:0;">Demo accounts:</p>
+            <p style="font-size:0.75rem;color:var(--text-muted);margin:0;">Admin: admin@nexusgear.com / Admin@123</p>
+            <p style="font-size:0.75rem;color:var(--text-muted);margin:0;">Customer: gamer@nexusgear.com / Customer@123</p>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,48 @@
+@model List<NexusGear.Models.Order>
+@{
+    ViewData["Title"] = "My Orders - NexusGear";
+}
+
+<div class="container py-5">
+    <nav aria-label="breadcrumb" class="mb-4"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="/">Home</a></li><li class="breadcrumb-item"><a href="/Dashboard">Dashboard</a></li><li class="breadcrumb-item active">My Orders</li></ol></nav>
+    <h1 style="font-family:'Orbitron',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:2rem;">My Orders</h1>
+
+    @if (!Model.Any())
+    {
+        <div class="empty-state"><i class="fas fa-box-open"></i><h4>No orders yet</h4><p>Your order history will appear here</p><a href="/Shop" class="btn-nexus btn-nexus-sm mt-2">Browse Shop</a></div>
+    }
+    else
+    {
+        <div class="glass-card">
+            <div class="table-responsive">
+                <table class="nexus-table">
+                    <thead>
+                        <tr>
+                            <th>Order #</th>
+                            <th>Date</th>
+                            <th>Items</th>
+                            <th>Payment</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var order in Model)
+                        {
+                            <tr>
+                                <td><strong style="color:var(--text-primary);">@order.OrderNumber</strong></td>
+                                <td style="white-space:nowrap;">@order.CreatedAt.ToString("MMM d, yyyy")</td>
+                                <td>@order.OrderItems.Count item@(order.OrderItems.Count == 1 ? "" : "s")</td>
+                                <td>@(order.PaymentMethod == "card" ? "Card" : "COD")</td>
+                                <td><strong style="color:var(--accent);font-family:'Orbitron',sans-serif;font-size:0.88rem;">$@order.Total.ToString("0.00")</strong></td>
+                                <td><span class="status-badge status-@order.Status">@order.Status</span></td>
+                                <td><a href="/Dashboard/OrderDetail/@order.Id" class="btn-nexus-outline btn-nexus-sm">Details</a></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</div>

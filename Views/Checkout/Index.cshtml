@@ -1,0 +1,251 @@
+
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<NexusGear.Models.ApplicationUser> SignInManager
+
+@model NexusGear.ViewModels.CheckoutViewModel
+@{
+    ViewData["Title"] = "Checkout - NexusGear";
+    var stripeKey = ViewBag.StripePublishableKey as string ?? "";
+}
+
+
+@if (!SignInManager.IsSignedIn(User))
+{
+    <div class="nexus-alert nexus-alert-info">
+        <a href="/Account/Login?returnUrl=/Cart">Login</a> to view your cart and checkout.
+    </div>
+}
+
+
+<div class="container py-5">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Home</a></li>
+            <li class="breadcrumb-item"><a href="/Cart">Cart</a></li>
+            <li class="breadcrumb-item active">Checkout</li>
+        </ol>
+    </nav>
+    <h1 style="font-family:'Orbitron',sans-serif;font-size:1.4rem;font-weight:800;margin-bottom:2rem;">Secure Checkout</h1>
+
+    <form id="checkoutForm" asp-controller="Checkout" asp-action="PlaceOrder" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="StripePaymentIntentId" id="stripePaymentIntentId" />
+
+        <div class="row g-4">
+            <!-- Left: Details + Payment -->
+            <div class="col-lg-7">
+                <!-- Shipping Details -->
+                <div class="checkout-section">
+                    <p class="checkout-section-title"><i class="fas fa-map-marker-alt me-2"></i>Shipping Details</p>
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <label class="nexus-label">First Name *</label>
+                            <input asp-for="FirstName" class="nexus-form-control" placeholder="John" />
+                            <span asp-validation-for="FirstName" class="field-validation-error"></span>
+                        </div>
+                        <div class="col-6">
+                            <label class="nexus-label">Last Name *</label>
+                            <input asp-for="LastName" class="nexus-form-control" placeholder="Doe" />
+                            <span asp-validation-for="LastName" class="field-validation-error"></span>
+                        </div>
+                        <div class="col-6">
+                            <label class="nexus-label">Email *</label>
+                            <input asp-for="Email" class="nexus-form-control" type="email" placeholder="your@email.com" />
+                            <span asp-validation-for="Email" class="field-validation-error"></span>
+                        </div>
+                        <div class="col-6">
+                            <label class="nexus-label">Phone *</label>
+                            <input asp-for="Phone" class="nexus-form-control" placeholder="+1 555 000 0000" />
+                            <span asp-validation-for="Phone" class="field-validation-error"></span>
+                        </div>
+                        <div class="col-12">
+                            <label class="nexus-label">Street Address *</label>
+                            <input asp-for="Address" class="nexus-form-control" placeholder="123 Gamer Street" />
+                            <span asp-validation-for="Address" class="field-validation-error"></span>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="nexus-label">City *</label>
+                            <input asp-for="City" class="nexus-form-control" placeholder="City" />
+                            <span asp-validation-for="City" class="field-validation-error"></span>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="nexus-label">Country *</label>
+                            <input asp-for="Country" class="nexus-form-control" placeholder="Country" />
+                            <span asp-validation-for="Country" class="field-validation-error"></span>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="nexus-label">Postal Code</label>
+                            <input asp-for="PostalCode" class="nexus-form-control" placeholder="00000" />
+                        </div>
+                        <div class="col-12">
+                            <label class="nexus-label">Order Notes <span style="color:var(--text-muted);">(optional)</span></label>
+                            <textarea asp-for="Notes" class="nexus-form-control" rows="2" placeholder="Any special instructions..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Method -->
+                <div class="checkout-section">
+                    <p class="checkout-section-title"><i class="fas fa-credit-card me-2"></i>Payment Method</p>
+                    <div class="d-flex flex-column gap-3">
+                        <!-- Card -->
+                        <div class="payment-method-option selected" id="opt-card" onclick="selectPayment('card')">
+                            <input type="radio" name="PaymentMethod" value="card" id="pm-card" checked />
+                            <div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="fab fa-cc-visa" style="font-size:1.4rem;color:#1a1aff;"></i>
+                                    <i class="fab fa-cc-mastercard" style="font-size:1.4rem;color:#eb001b;"></i>
+                                    <strong style="font-size:0.9rem;color:var(--text-primary);">Credit / Debit Card</strong>
+                                </div>
+                                <p style="font-size:0.78rem;color:var(--text-muted);margin:0;">Secured by Stripe — 256-bit SSL encryption</p>
+                            </div>
+                        </div>
+                        <!-- Cash on Delivery -->
+                        <div class="payment-method-option" id="opt-cod" onclick="selectPayment('cod')">
+                            <input type="radio" name="PaymentMethod" value="cod" id="pm-cod" />
+                            <div>
+                                <strong style="font-size:0.9rem;color:var(--text-primary);"><i class="fas fa-money-bill-wave me-2" style="color:var(--success);"></i>Cash on Delivery</strong>
+                                <p style="font-size:0.78rem;color:var(--text-muted);margin:0;">Pay when your order arrives</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Stripe Card Element -->
+                    <div id="stripe-panel" class="mt-3">
+                        <label class="nexus-label">Card Details</label>
+                        <div id="stripe-card-element"></div>
+                        <div id="stripe-error" class="nexus-alert nexus-alert-danger mt-2" style="display:none;"></div>
+                    </div>
+
+                    <!-- COD Note -->
+                    <div id="cod-panel" class="mt-3 nexus-alert nexus-alert-info" style="display:none;">
+                        <i class="fas fa-info-circle me-1"></i>
+                        You will pay cash when your order is delivered. Please have the exact amount ready.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Order Summary -->
+            <div class="col-lg-5">
+                <div class="order-summary-card">
+                    <h3 style="font-family:'Orbitron',sans-serif;font-size:0.92rem;font-weight:700;margin-bottom:1.25rem;color:var(--primary-light);">
+                        <i class="fas fa-receipt me-2"></i>Order Summary
+                    </h3>
+                    <div class="summary-row">
+                        <span>Subtotal</span>
+                        <span>$@Model.Subtotal.ToString("0.00")</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Shipping</span>
+                        <span style="@(Model.ShippingCost == 0 ? "color:var(--success);" : "")">
+                            @(Model.ShippingCost == 0 ? "FREE" : "$" + Model.ShippingCost.ToString("0.00"))
+                        </span>
+                    </div>
+                    <hr style="border-color:var(--border);margin:0.75rem 0;" />
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <span style="font-weight:700;color:var(--text-primary);">Total</span>
+                        <span class="summary-total">$@Model.Total.ToString("0.00")</span>
+                    </div>
+
+                    <button type="button" id="placeOrderBtn" class="btn-nexus w-100" style="justify-content:center;padding:0.9rem;font-size:0.95rem;">
+                        <i class="fas fa-lock me-2"></i>Place Order — $@Model.Total.ToString("0.00")
+                    </button>
+                    <p style="text-align:center;font-size:0.75rem;color:var(--text-muted);margin-top:0.75rem;">
+                        <i class="fas fa-shield-alt me-1" style="color:var(--success);"></i>
+                        Your payment information is encrypted and secure
+                    </p>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @if (!string.IsNullOrEmpty(stripeKey) && stripeKey != "pk_test_YOUR_STRIPE_PUBLISHABLE_KEY")
+    {
+        <script src="https://js.stripe.com/v3/"></script>
+        <script>
+            const stripe = Stripe('@stripeKey');
+            const elements = stripe.elements();
+            const cardElement = elements.create('card', {
+                style: {
+                    base: {
+                        color: '#f1e8ff',
+                        fontFamily: "'Exo 2', sans-serif",
+                        fontSize: '15px',
+                        '::placeholder': { color: '#7c6a9a' }
+                    },
+                    invalid: { color: '#ef4444' }
+                }
+            });
+            cardElement.mount('#stripe-card-element');
+            cardElement.on('focus', () => document.getElementById('stripe-card-element').classList.add('focused'));
+            cardElement.on('blur', () => document.getElementById('stripe-card-element').classList.remove('focused'));
+
+            let currentMethod = 'card';
+
+            function selectPayment(method) {
+                currentMethod = method;
+                document.getElementById('opt-card').classList.toggle('selected', method === 'card');
+                document.getElementById('opt-cod').classList.toggle('selected', method === 'cod');
+                document.getElementById('stripe-panel').style.display = method === 'card' ? 'block' : 'none';
+                document.getElementById('cod-panel').style.display = method === 'cod' ? 'block' : 'none';
+                document.querySelector('input[name="PaymentMethod"][value="' + method + '"]').checked = true;
+            }
+
+            document.getElementById('placeOrderBtn').addEventListener('click', async () => {
+                const btn = document.getElementById('placeOrderBtn');
+                btn.disabled = true;
+                btn.innerHTML = '<span class="nx-spinner me-2"></span>Processing...';
+
+                if (currentMethod === 'card') {
+                    try {
+                        const res = await fetch('/Checkout/CreatePaymentIntent', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ paymentMethod: 'card' })
+                        });
+                        const { clientSecret, intentId } = await res.json();
+                        const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+                            payment_method: { card: cardElement }
+                        });
+                        if (error) {
+                            const errEl = document.getElementById('stripe-error');
+                            errEl.textContent = error.message;
+                            errEl.style.display = 'block';
+                            btn.disabled = false;
+                            btn.innerHTML = '<i class="fas fa-lock me-2"></i>Place Order — $@Model.Total.ToString("0.00")';
+                            return;
+                        }
+                        document.getElementById('stripePaymentIntentId').value = paymentIntent.id;
+                    } catch (e) {
+                        showToast('Payment processing failed. Please try again.', 'error');
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fas fa-lock me-2"></i>Place Order — $@Model.Total.ToString("0.00")';
+                        return;
+                    }
+                }
+                document.getElementById('checkoutForm').submit();
+            });
+        </script>
+    }
+    else
+    {
+        <script>
+            // Stripe not configured — submit directly (simulated)
+            function selectPayment(method) {
+                document.getElementById('opt-card').classList.toggle('selected', method === 'card');
+                document.getElementById('opt-cod').classList.toggle('selected', method === 'cod');
+                document.getElementById('stripe-panel').style.display = method === 'card' ? 'block' : 'none';
+                document.getElementById('cod-panel').style.display = method === 'cod' ? 'block' : 'none';
+                document.querySelector('input[name="PaymentMethod"][value="' + method + '"]').checked = true;
+            }
+
+            document.getElementById('placeOrderBtn').addEventListener('click', () => {
+                document.getElementById('checkoutForm').submit();
+            });
+
+            document.getElementById('stripe-panel').innerHTML += '<div class="nexus-alert nexus-alert-info mt-3"><i class="fas fa-info-circle me-1"></i>Stripe not configured. Add your API keys to appsettings.json to enable real payments.</div>';
+        </script>
+    }
+}

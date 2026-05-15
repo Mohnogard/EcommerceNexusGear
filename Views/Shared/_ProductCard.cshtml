@@ -1,0 +1,80 @@
+@model NexusGear.Models.Product
+@{
+    bool outOfStock = Model.IsOutOfStock;
+    string fallback = $"https://placehold.co/400x300/150020/a855f7?text={Uri.EscapeDataString(Model.Name)}";
+}
+<div class="col-6 col-md-4 col-xl-3">
+    <div class="product-card @(outOfStock ? "out-of-stock" : "")">
+        <!-- Image -->
+        <div class="product-card-img-wrap">
+            <a href="/shop/@Model.Slug">
+                <img src="@(Model.ImageUrl ?? fallback)"
+                     alt="@Model.Name"
+                     onerror="this.src='@fallback'" />
+            </a>
+
+            @if (outOfStock)
+            {
+                <div class="out-of-stock-overlay">
+                    <span class="out-of-stock-text">OUT OF STOCK</span>
+                </div>
+            }
+
+            @if (Model.DiscountPercentage > 0)
+            {
+                <div class="discount-ribbon">-@Model.DiscountPercentage.ToString("0")%</div>
+            }
+
+            @if (Model.IsNewArrival && !outOfStock)
+            {
+                <div class="new-badge">NEW</div>
+            }
+        </div>
+
+        <!-- Body -->
+        <div class="product-card-body">
+            @if (!string.IsNullOrEmpty(Model.Brand))
+            {
+                <p class="product-brand">@Model.Brand</p>
+            }
+            <a href="/shop/@Model.Slug" class="text-decoration-none">
+                <p class="product-name">@Model.Name</p>
+            </a>
+
+            <!-- Stars -->
+            <div class="d-flex align-items-center gap-1">
+                <div class="stars">
+                    @for (int i = 1; i <= 5; i++)
+                    {
+                        <i class="fas fa-star @(i <= Math.Round(Model.AverageRating) ? "filled" : "")"></i>
+                    }
+                </div>
+                <span class="review-count">(@Model.ReviewCount)</span>
+            </div>
+
+            <!-- Price -->
+            <div class="price-wrap">
+                @if (Model.DiscountPercentage > 0)
+                {
+                    <span class="price-original">$@Model.Price.ToString("0.00")</span>
+                    <span class="price-current">$@Model.DiscountedPrice.ToString("0.00")</span>
+                }
+                else
+                {
+                    <span class="price-current">$@Model.Price.ToString("0.00")</span>
+                }
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="product-card-actions">
+            <button class="btn-cart" onclick="addToCart(@Model.Id, 1, this)" @(outOfStock ? "disabled" : "")>
+                <i class="fas fa-cart-plus"></i>
+                @(outOfStock ? "Out of Stock" : "Add to Cart")
+            </button>
+            <button class="btn-wishlist" onclick="toggleWishlist(@Model.Id, this)" title="Add to Wishlist">
+                <i class="far fa-heart"></i>
+            </button>
+        </div>
+    </div>
+</div>

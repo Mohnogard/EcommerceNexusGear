@@ -1,0 +1,179 @@
+@model NexusGear.Models.Order
+@{
+    ViewData["Title"] = "Order #" + Model.Id;
+    var statusColor = Model.Status.ToString() switch {
+        "Pending" => "#f59e0b",
+        "Confirmed" => "#3b82f6",
+        "Processing" => "#8b5cf6",
+        "Shipped" => "#06b6d4",
+        "Delivered" => "#10b981",
+        "Cancelled" => "#ef4444",
+        "Refunded" => "#f97316",
+        _ => "var(--text-muted)"
+    };
+}
+
+<div class="mb-4 d-flex align-items-center gap-3">
+    <a href="/Admin/Orders" class="btn-nexus-outline btn-nexus-sm"><i class="fas fa-arrow-left me-1"></i>Back</a>
+    <h5 style="margin:0;color:var(--text-primary);">Order <span style="color:var(--primary);">#@Model.Id</span></h5>
+    <span style="background:@(statusColor)22;color:@statusColor;font-size:0.75rem;padding:3px 12px;border-radius:20px;font-weight:600;">@Model.Status</span>
+</div>
+
+<div class="row g-4">
+    <!-- Order Items -->
+    <div class="col-lg-8">
+        <div class="glass-card p-4 mb-4">
+            <h6 style="color:var(--primary);margin-bottom:1rem;font-family:'Orbitron',sans-serif;font-size:0.85rem;letter-spacing:1px;">ORDER ITEMS</h6>
+            <div class="table-responsive">
+                <table class="nexus-table">
+                    <thead>
+                        <tr><th>Product</th><th>Price</th><th>Qty</th><th>Total</th></tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.OrderItems)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        @if (!string.IsNullOrEmpty(item.Product?.ImageUrl))
+                                        {
+                                            <img src="@item.Product.ImageUrl" style="width:42px;height:42px;object-fit:cover;border-radius:6px;" onerror="this.style.display='none'" />
+                                        }
+                                        <div>
+                                            <div style="font-weight:600;color:var(--text-primary);">@item.ProductName</div>
+                                            <div style="font-size:0.75rem;color:var(--text-muted);">ID: @item.ProductId</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>$@item.UnitPrice.ToString("0.00")</td>
+                                <td>@item.Quantity</td>
+                                <td><strong style="color:var(--accent);">$@item.Total.ToString("0.00")</strong></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div style="border-top:1px solid var(--border);margin-top:1rem;padding-top:1rem;">
+                <div class="d-flex justify-content-end">
+                    <div style="min-width:200px;">
+                        <div class="d-flex justify-content-between mb-1" style="font-size:0.85rem;color:var(--text-muted);">
+                            <span>Subtotal</span><span>$@Model.Subtotal.ToString("0.00")</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2" style="font-size:0.85rem;color:var(--text-muted);">
+                            <span>Shipping</span><span>@(Model.ShippingCost == 0 ? "Free" : "$" + Model.ShippingCost.ToString("0.00"))</span>
+                        </div>
+                        <div class="d-flex justify-content-between" style="font-weight:700;color:var(--text-primary);font-size:1rem;border-top:1px solid var(--border);padding-top:0.5rem;">
+                            <span>Total</span><span style="color:var(--accent);">$@Model.Total.ToString("0.00")</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Update Status -->
+        <div class="glass-card p-4">
+            <h6 style="color:var(--primary);margin-bottom:1rem;font-family:'Orbitron',sans-serif;font-size:0.85rem;letter-spacing:1px;">UPDATE STATUS</h6>
+            <form asp-action="UpdateStatus" method="post" class="d-flex gap-3 align-items-end flex-wrap">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" value="@Model.Id" />
+                <div>
+                    <label class="nexus-label mb-1">New Status</label>
+                    <select name="status" class="nexus-form-control" style="width:180px;">
+                        @foreach (var s in new[] { "Pending","Confirmed","Processing","Shipped","Delivered","Cancelled","Refunded" })
+                        {
+                            <option value="@s" selected="@(Model.Status.ToString() == s ? "selected" : null)">@s</option>
+                        }
+                    </select>
+                </div>
+                <button type="submit" class="btn-nexus"><i class="fas fa-sync me-2"></i>Update Status</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+        <!-- Customer Info -->
+        <div class="glass-card p-4 mb-4">
+            <h6 style="color:var(--primary);margin-bottom:1rem;font-family:'Orbitron',sans-serif;font-size:0.85rem;letter-spacing:1px;">CUSTOMER</h6>
+            <div style="font-weight:600;color:var(--text-primary);margin-bottom:0.25rem;">@Model.User?.FirstName @Model.User?.LastName</div>
+            <div style="font-size:0.85rem;color:var(--text-muted);margin-bottom:0.25rem;"><i class="fas fa-envelope me-1"></i>@Model.User?.Email</div>
+            @if (!string.IsNullOrEmpty(Model.ShippingPhone))
+            {
+                <div style="font-size:0.85rem;color:var(--text-muted);"><i class="fas fa-phone me-1"></i>@Model.ShippingPhone</div>
+            }
+        </div>
+
+        <!-- Shipping Address -->
+        <div class="glass-card p-4 mb-4">
+            <h6 style="color:var(--primary);margin-bottom:1rem;font-family:'Orbitron',sans-serif;font-size:0.85rem;letter-spacing:1px;">SHIPPING ADDRESS</h6>
+            <div style="font-size:0.85rem;color:var(--text-muted);line-height:1.8;">
+                <div>@Model.ShippingAddress</div>
+                <div>@Model.ShippingCity, @Model.ShippingPostalCode</div>
+                <div>@Model.ShippingCountry</div>
+            </div>
+        </div>
+
+        <!-- Payment Info -->
+        <div class="glass-card p-4 mb-4">
+            <h6 style="color:var(--primary);margin-bottom:1rem;font-family:'Orbitron',sans-serif;font-size:0.85rem;letter-spacing:1px;">PAYMENT</h6>
+            <div class="d-flex justify-content-between mb-2" style="font-size:0.85rem;">
+                <span style="color:var(--text-muted);">Method</span>
+                <span style="color:var(--text-primary);">
+                    @if (Model.PaymentMethod == "card")
+                    {
+                        <i class="fas fa-credit-card me-1" style="color:var(--primary);"></i>
+                        <text>Credit Card</text>
+                    }
+                    else
+                    {
+                        <i class="fas fa-money-bill-wave me-1" style="color:var(--success);"></i>
+                        <text>Cash on Delivery</text>
+                    }
+                </span>
+            </div>
+            <div class="d-flex justify-content-between mb-2" style="font-size:0.85rem;">
+                <span style="color:var(--text-muted);">Status</span>
+                @{
+                    var pColor = Model.PaymentStatus.ToString() switch {
+                        "Paid" => "var(--success)",
+                        "Failed" => "var(--danger)",
+                        "Refunded" => "#f97316",
+                        _ => "#f59e0b"
+                    };
+                }
+                <span style="color:@pColor;font-weight:600;">@Model.PaymentStatus</span>
+            </div>
+            @if (!string.IsNullOrEmpty(Model.StripePaymentIntentId))
+            {
+                <div style="font-size:0.75rem;color:var(--text-muted);word-break:break-all;">
+                    Intent: @Model.StripePaymentIntentId
+                </div>
+            }
+        </div>
+
+        <!-- Order Notes -->
+        @if (!string.IsNullOrEmpty(Model.Notes))
+        {
+            <div class="glass-card p-4">
+                <h6 style="color:var(--primary);margin-bottom:1rem;font-family:'Orbitron',sans-serif;font-size:0.85rem;letter-spacing:1px;">NOTES</h6>
+                <p style="font-size:0.85rem;color:var(--text-muted);margin:0;">@Model.Notes</p>
+            </div>
+        }
+
+        <!-- Timestamps -->
+        <div class="glass-card p-4 mt-4">
+            <h6 style="color:var(--primary);margin-bottom:1rem;font-family:'Orbitron',sans-serif;font-size:0.85rem;letter-spacing:1px;">TIMELINE</h6>
+            <div style="font-size:0.8rem;color:var(--text-muted);">
+                <div class="d-flex justify-content-between mb-1">
+                    <span>Placed</span><span>@Model.CreatedAt.ToString("MMM dd, yyyy HH:mm")</span>
+                </div>
+                @if (Model.UpdatedAt.HasValue)
+                {
+                    <div class="d-flex justify-content-between">
+                        <span>Updated</span><span>@Model.UpdatedAt.Value.ToString("MMM dd, yyyy HH:mm")</span>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

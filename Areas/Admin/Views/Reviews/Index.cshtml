@@ -1,0 +1,93 @@
+@model List<NexusGear.Models.Review>
+@{
+    ViewData["Title"] = "Reviews";
+    bool pendingOnly = ViewBag.Pending == true;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <p style="color:var(--text-muted);font-size:0.85rem;margin:0;">@Model.Count review(s)</p>
+    <div class="d-flex gap-2">
+        <a href="/Admin/Reviews" class="@(pendingOnly ? "btn-nexus-outline" : "btn-nexus") btn-nexus-sm">All</a>
+        <a href="/Admin/Reviews?pending=true" class="@(pendingOnly ? "btn-nexus" : "btn-nexus-outline") btn-nexus-sm">Pending</a>
+    </div>
+</div>
+
+<div class="glass-card">
+    <div class="table-responsive">
+        <table class="nexus-table">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Customer</th>
+                    <th>Rating</th>
+                    <th>Review</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var review in Model)
+                {
+                    <tr>
+                        <td>
+                            <a href="/Admin/Products/Edit/@review.ProductId" style="color:var(--primary);font-size:0.85rem;text-decoration:none;">
+                                @review.Product?.Name
+                            </a>
+                        </td>
+                        <td>
+                            <div style="font-weight:600;color:var(--text-primary);font-size:0.85rem;">@review.User?.FirstName @review.User?.LastName</div>
+                            <div style="font-size:0.75rem;color:var(--text-muted);">@review.User?.Email</div>
+                        </td>
+                        <td>
+                            <div style="letter-spacing:1px;">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    <i class="fas fa-star" style="font-size:11px;color:@(i <= review.Rating ? "#f59e0b" : "var(--border)");"></i>
+                                }
+                                <span style="color:var(--text-muted);font-size:0.75rem;margin-left:4px;">(@review.Rating)</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="font-size:0.8rem;color:var(--text-muted);max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                                @review.Content
+                            </div>
+                        </td>
+                        <td>
+                            @if (review.IsApproved)
+                            {
+                                <span style="background:rgba(16,185,129,0.12);color:var(--success);font-size:0.7rem;padding:2px 8px;border-radius:20px;font-weight:600;">Approved</span>
+                            }
+                            else
+                            {
+                                <span style="background:rgba(245,158,11,0.12);color:#f59e0b;font-size:0.7rem;padding:2px 8px;border-radius:20px;font-weight:600;">Pending</span>
+                            }
+                        </td>
+                        <td style="font-size:0.78rem;color:var(--text-muted);">@review.CreatedAt.ToString("MMM dd, yyyy")</td>
+                        <td>
+                            <div class="d-flex gap-1">
+                                @if (!review.IsApproved)
+                                {
+                                    <form asp-action="Approve" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@review.Id" />
+                                        <button type="submit" class="btn-nexus btn-nexus-sm" title="Approve"><i class="fas fa-check"></i></button>
+                                    </form>
+                                }
+                                <form asp-action="Delete" method="post" class="d-inline" onsubmit="return confirm('Delete this review?')">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@review.Id" />
+                                    <button type="submit" class="btn-danger-nx" title="Delete"><i class="fas fa-trash"></i></button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Any())
+                {
+                    <tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:2rem;">No reviews found.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

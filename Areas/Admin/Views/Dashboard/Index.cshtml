@@ -1,0 +1,129 @@
+@model NexusGear.ViewModels.AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<!-- Stats Grid -->
+<div class="row g-3 mb-4">
+    @{
+        var stats = new[] {
+            (Model.TotalRevenue.ToString("$0.00"), "Total Revenue", "fas fa-dollar-sign", "rgba(168,85,247,0.12)", "var(--primary)"),
+            (Model.TotalOrders.ToString(), "Total Orders", "fas fa-shopping-cart", "rgba(6,182,212,0.12)", "var(--info)"),
+            (Model.TotalProducts.ToString(), "Active Products", "fas fa-box", "rgba(16,185,129,0.12)", "var(--success)"),
+            (Model.TotalUsers.ToString(), "Registered Users", "fas fa-users", "rgba(245,158,11,0.12)", "var(--accent)"),
+            (Model.MonthlyRevenue.ToString("$0.00"), "This Month", "fas fa-trending-up", "rgba(236,72,153,0.12)", "var(--secondary)"),
+            (Model.PendingOrders.ToString(), "Pending Orders", "fas fa-clock", "rgba(239,68,68,0.12)", "var(--danger)"),
+            (Model.PendingReviews.ToString(), "Pending Reviews", "fas fa-star", "rgba(168,85,247,0.12)", "var(--primary-light)"),
+            (Model.OutOfStockCount.ToString(), "Out of Stock", "fas fa-exclamation-triangle", "rgba(239,68,68,0.12)", "var(--danger)"),
+        };
+    }
+    @foreach (var s in stats)
+    {
+        <div class="col-sm-6 col-lg-3">
+            <div class="dash-stat-card">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="dash-stat-icon" style="background:@s.Item4;color:@s.Item5;"><i class="@s.Item3"></i></div>
+                    <div>
+                        <p class="dash-stat-value">@s.Item1</p>
+                        <p class="dash-stat-label">@s.Item2</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Charts -->
+<div class="row g-4 mb-4">
+    <div class="col-lg-8">
+        <div class="glass-card p-4">
+            <h3 style="font-family:'Orbitron',sans-serif;font-size:0.88rem;font-weight:700;color:var(--primary-light);margin-bottom:1.25rem;">Revenue &amp; Orders (Last 6 Months)</h3>
+            <canvas id="revenueChart" height="100"></canvas>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="glass-card p-4">
+            <h3 style="font-family:'Orbitron',sans-serif;font-size:0.88rem;font-weight:700;color:var(--primary-light);margin-bottom:1.25rem;">Sales by Category</h3>
+            <canvas id="categoryChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Orders -->
+<div class="glass-card">
+    <div class="d-flex justify-content-between align-items-center p-3" style="border-bottom:1px solid var(--border);">
+        <h3 style="font-family:'Orbitron',sans-serif;font-size:0.88rem;font-weight:700;color:var(--primary-light);margin:0;">Recent Orders</h3>
+        <a href="/Admin/Orders" class="btn-nexus-outline btn-nexus-sm">View All</a>
+    </div>
+    <div class="table-responsive">
+        <table class="nexus-table">
+            <thead>
+                <tr><th>Order #</th><th>Customer</th><th>Date</th><th>Total</th><th>Payment</th><th>Status</th><th></th></tr>
+            </thead>
+            <tbody>
+                @foreach (var order in Model.RecentOrders)
+                {
+                    <tr>
+                        <td><strong style="color:var(--text-primary);">@order.OrderNumber</strong></td>
+                        <td>@order.User?.FullName</td>
+                        <td style="white-space:nowrap;">@order.CreatedAt.ToString("MMM d, yyyy")</td>
+                        <td><strong style="color:var(--accent);font-family:'Orbitron',sans-serif;font-size:0.85rem;">$@order.Total.ToString("0.00")</strong></td>
+                        <td style="font-size:0.82rem;">@(order.PaymentMethod == "card" ? "Card" : "COD")</td>
+                        <td><span class="status-badge status-@order.Status">@order.Status</span></td>
+                        <td><a href="/Admin/Orders/Detail/@order.Id" class="btn-nexus-outline btn-nexus-sm">View</a></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const chartDefaults = {
+            plugins: { legend: { labels: { color: '#c4b5fd', font: { family: "'Exo 2'" } } } },
+            scales: {
+                x: { ticks: { color: '#7c6a9a' }, grid: { color: 'rgba(168,85,247,0.08)' } },
+                y: { ticks: { color: '#7c6a9a' }, grid: { color: 'rgba(168,85,247,0.08)' } }
+            }
+        };
+
+        new Chart(document.getElementById('revenueChart').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: [@Html.Raw(string.Join(",", Model.RevenueChartData.Select(d => $"'{d.Month}'")))],
+                datasets: [
+                    { label: 'Revenue ($)', data: [@string.Join(",", Model.RevenueChartData.Select(d => d.Revenue))],
+                      backgroundColor: 'rgba(168,85,247,0.6)', borderRadius: 6 },
+                    { label: 'Orders', data: [@string.Join(",", Model.RevenueChartData.Select(d => d.OrderCount))],
+                      backgroundColor: 'rgba(236,72,153,0.5)', borderRadius: 6, yAxisID: 'y1' }
+                ]
+            },
+            options: {
+                ...chartDefaults,
+                scales: {
+                    ...chartDefaults.scales,
+                    y: { ...chartDefaults.scales.y, beginAtZero: true, title: { display: true, text: 'Revenue ($)', color: '#7c6a9a' } },
+                    y1: { beginAtZero: true, position: 'right', ticks: { color: '#7c6a9a' }, grid: { drawOnChartArea: false }, title: { display: true, text: 'Orders', color: '#7c6a9a' } }
+                }
+            }
+        });
+
+        @if (Model.CategorySalesData.Any())
+        {
+            <text>
+            new Chart(document.getElementById('categoryChart').getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: [@Html.Raw(string.Join(",", Model.CategorySalesData.Select(d => $"'{d.CategoryName}'")))],
+                    datasets: [{ data: [@string.Join(",", Model.CategorySalesData.Select(d => d.SalesCount))],
+                        backgroundColor: ['#a855f7','#ec4899','#06b6d4','#10b981','#f59e0b','#ef4444','#6366f1','#8b5cf6'],
+                        borderWidth: 0 }]
+                },
+                options: { plugins: { legend: { position: 'bottom', labels: { color: '#c4b5fd', padding: 10, font: { family: "'Exo 2'", size: 11 } } } }, cutout: '65%' }
+            });
+            </text>
+        }
+    </script>
+}

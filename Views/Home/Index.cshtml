@@ -1,0 +1,370 @@
+@model NexusGear.ViewModels.HomeViewModel
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<NexusGear.Models.ApplicationUser> SignInManager
+@{
+    ViewData["Title"] = "NexusGear - Elite Gaming Peripherals & RGB Lighting";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Hero Slider -->
+<section>
+    <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5500">
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active"></button>
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"></button>
+        </div>
+        <div class="carousel-inner">
+            <!-- Slide 1 -->
+            <div class="carousel-item active">
+                <div class="hero-section" style="min-height:620px;">
+                    <div class="hero-bg">
+                        <div class="hero-bg-gradient"></div>
+                        <div class="hero-grid"></div>
+                        <div class="hero-glow-1"></div>
+                        <div class="hero-glow-2"></div>
+                    </div>
+                    <div class="container w-100">
+                        <div class="row align-items-center g-4 py-5">
+                            <div class="col-lg-6 hero-content">
+                                <span class="hero-eyebrow"><i class="fas fa-bolt me-2"></i>2026 Gaming Collection</span>
+                                <h1 class="hero-title text-white">Dominate<br><span class="line-accent">the Battlefield</span></h1>
+                                <p class="hero-desc">Pro-grade mice, keyboards, headsets, and RGB lighting. Built for winners, priced for everyone.</p>
+                                <div class="hero-actions">
+                                    <a href="/Shop" class="btn-nexus btn-nexus-lg"><i class="fas fa-store me-2"></i>View Shop</a>
+                                    <a href="/Shop?onlyDiscounted=true" class="btn-nexus-outline btn-nexus-lg"><i class="fas fa-fire me-2"></i>View Deals</a>
+                                </div>
+                                <div class="hero-stats">
+                                    <div><p class="hero-stat-num">500+</p><p class="hero-stat-label">Products</p></div>
+                                    <div><p class="hero-stat-num">50K+</p><p class="hero-stat-label">Gamers Served</p></div>
+                                    <div><p class="hero-stat-num">4.9★</p><p class="hero-stat-label">Avg Rating</p></div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 hero-image-wrap d-none d-lg-flex">
+                                <div class="hero-ring"></div>
+                                <img src="/images/hero-setup.png" alt="Gaming Setup"
+                                     onerror="this.src='https://placehold.co/500x400/150020/a855f7?text=NexusGear'" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Slide 2 -->
+            <div class="carousel-item">
+                <div style="min-height:620px;background:linear-gradient(135deg,#0d001a 0%,#2d0039 50%,#0a0010 100%);display:flex;align-items:center;position:relative;overflow:hidden;">
+                    <div class="hero-grid" style="position:absolute;inset:0;"></div>
+                    <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 80% 50%, rgba(236,72,153,0.2) 0%, transparent 65%);"></div>
+                    <div class="container py-5">
+                        <div class="row">
+                            <div class="col-lg-6 hero-content">
+                                <span class="hero-eyebrow" style="background:rgba(236,72,153,0.12);border-color:rgba(236,72,153,0.4);color:#f9a8d4;"><i class="fas fa-tag me-2"></i>Up to 30% Off</span>
+                                <h1 class="hero-title text-white">Massive<br><span style="background:linear-gradient(135deg,#ec4899,#f43f5e);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Savings</span></h1>
+                                <p class="hero-desc">Limited-time deals on top gaming peripherals. Don't miss out on our biggest discounts ever.</p>
+                                <div class="hero-actions">
+                                    <a href="/Shop?onlyDiscounted=true" class="btn-nexus btn-nexus-lg" style="background:linear-gradient(135deg,#be185d,#9d174d);"><i class="fas fa-fire me-2"></i>See All Deals</a>
+                                    <a href="/Shop" class="btn-nexus-outline btn-nexus-lg">Browse All</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Slide 3 -->
+            <div class="carousel-item">
+                <div style="min-height:620px;background:linear-gradient(135deg,#000d1a 0%,#001a33 50%,#0a0010 100%);display:flex;align-items:center;position:relative;overflow:hidden;">
+                    <div class="hero-grid" style="position:absolute;inset:0;background-image:linear-gradient(rgba(6,182,212,0.06) 1px,transparent 1px),linear-gradient(90deg,rgba(6,182,212,0.06) 1px,transparent 1px);"></div>
+                    <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 70% 50%, rgba(6,182,212,0.15) 0%, transparent 65%);"></div>
+                    <div class="container py-5">
+                        <div class="row">
+                            <div class="col-lg-6 hero-content">
+                                <span class="hero-eyebrow" style="background:rgba(6,182,212,0.1);border-color:rgba(6,182,212,0.4);color:#67e8f9;"><i class="fas fa-star me-2"></i>Just Dropped</span>
+                                <h1 class="hero-title text-white">New Arrivals<br><span style="background:linear-gradient(135deg,#06b6d4,#0ea5e9);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Are Here</span></h1>
+                                <p class="hero-desc">Be the first to get the latest gaming gear from the world's top brands. Fresh stock just landed.</p>
+                                <div class="hero-actions">
+                                    <a href="/Shop?sortBy=newest" class="btn-nexus btn-nexus-lg" style="background:linear-gradient(135deg,#0891b2,#0369a1);"><i class="fas fa-star me-2"></i>New Products</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon"></span>
+        </button>
+    </div>
+</section>
+
+<!-- Features Bar -->
+<section class="features-bar">
+    <div class="container">
+        <div class="row g-3">
+            <div class="col-6 col-md-3"><div class="feature-item">
+                <div class="feature-icon"><i class="fas fa-shipping-fast"></i></div>
+                <div><p class="feature-title">Free Shipping</p><p class="feature-desc">Orders over $50</p></div>
+            </div></div>
+            <div class="col-6 col-md-3"><div class="feature-item">
+                <div class="feature-icon" style="color:var(--secondary);"><i class="fas fa-undo-alt"></i></div>
+                <div><p class="feature-title">Easy Returns</p><p class="feature-desc">30-day policy</p></div>
+            </div></div>
+            <div class="col-6 col-md-3"><div class="feature-item">
+                <div class="feature-icon" style="color:var(--accent);"><i class="fas fa-shield-alt"></i></div>
+                <div><p class="feature-title">Secure Payments</p><p class="feature-desc">256-bit SSL</p></div>
+            </div></div>
+            <div class="col-6 col-md-3"><div class="feature-item">
+                <div class="feature-icon" style="color:var(--info);"><i class="fas fa-headset"></i></div>
+                <div><p class="feature-title">24/7 Support</p><p class="feature-desc">Always here</p></div>
+            </div></div>
+        </div>
+    </div>
+</section>
+
+<!-- Categories -->
+@if (Model.Categories.Any())
+{
+    <section class="section-pad">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-end mb-4">
+                <div>
+                    <span class="section-divider-badge d-inline-block mb-2">Browse</span>
+                    <h2 class="section-title mb-1">Shop by <span class="highlight">Category</span></h2>
+                    <p class="section-subtitle">Find exactly what you're looking for</p>
+                </div>
+                <a href="/Shop" class="btn-nexus-outline btn-nexus-sm d-none d-md-inline-flex">View All</a>
+            </div>
+            <div class="row g-3">
+                @foreach (var cat in Model.Categories.Take(8))
+                {
+                    <div class="col-6 col-md-3">
+                        <a href="/Shop?categoryId=@cat.Id" class="category-card d-block">
+                            <img src="@(cat.ImageUrl ?? $"https://placehold.co/300x200/150020/a855f7?text={Uri.EscapeDataString(cat.Name)}")"
+                                 alt="@cat.Name"
+                                 onerror="this.src='https://placehold.co/300x200/150020/a855f7?text=@Uri.EscapeDataString(cat.Name)'" />
+                            <div class="category-overlay">
+                                <p class="category-name">@cat.Name</p>
+                                <span class="category-shop-link">Shop Now &rarr;</span>
+                            </div>
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+}
+
+<!-- Featured Products -->
+@if (Model.FeaturedProducts.Any())
+{
+    <section class="section-pad" style="background:var(--bg-secondary);border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-end mb-4">
+                <div>
+                    <span class="section-divider-badge d-inline-block mb-2">Hand-picked</span>
+                    <h2 class="section-title mb-1">Featured <span class="highlight">Products</span></h2>
+                    <p class="section-subtitle">Our team's top picks for your battlestation</p>
+                </div>
+                <a href="/Shop" class="btn-nexus-outline btn-nexus-sm d-none d-md-inline-flex">View All</a>
+            </div>
+            <div class="row g-3">
+                @foreach (var product in Model.FeaturedProducts)
+                {
+                    @await Html.PartialAsync("_ProductCard", product)
+                }
+            </div>
+        </div>
+    </section>
+}
+
+<!-- Promo Banners -->
+<section class="section-pad-sm">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="promo-banner promo-banner-purple">
+                    <div style="position:relative;z-index:1;">
+                        <p style="font-family:'Orbitron',sans-serif;font-size:0.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--primary-light);margin-bottom:0.5rem;">LIMITED TIME</p>
+                        <h3 style="color:#fff;font-size:1.4rem;">Up to 30% OFF</h3>
+                        <p style="color:rgba(255,255,255,0.7);font-size:0.88rem;margin-bottom:1rem;">On gaming mice &amp; keyboards this week only</p>
+                        <a href="/Shop?onlyDiscounted=true" class="btn-nexus btn-nexus-sm"><i class="fas fa-fire me-1"></i>Grab the Deal</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="promo-banner promo-banner-pink">
+                    <div style="position:relative;z-index:1;">
+                        <p style="font-family:'Orbitron',sans-serif;font-size:0.7rem;letter-spacing:2px;text-transform:uppercase;color:#f9a8d4;margin-bottom:0.5rem;">ALWAYS FREE</p>
+                        <h3 style="color:#fff;font-size:1.4rem;">Free Shipping</h3>
+                        <p style="color:rgba(255,255,255,0.7);font-size:0.88rem;margin-bottom:1rem;">On all orders over $50 — no code needed</p>
+                        <a href="/Shop" class="btn-nexus btn-nexus-sm" style="background:linear-gradient(135deg,#be185d,#9d174d);"><i class="fas fa-store me-1"></i>Shop Now</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Hot Deals -->
+@if (Model.DiscountedProducts.Any())
+{
+    <section class="section-pad" style="background:var(--bg-secondary);border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-end mb-4">
+                <div>
+                    <span class="section-divider-badge d-inline-block mb-2" style="color:var(--secondary);border-color:rgba(236,72,153,0.3);background:rgba(236,72,153,0.07);">Hot Deals</span>
+                    <h2 class="section-title mb-1">Limited-Time <span class="highlight-pink">Discounts</span></h2>
+                    <p class="section-subtitle">Prices that won't last — grab them while you can</p>
+                </div>
+                <a href="/Shop?onlyDiscounted=true" class="btn-nexus-outline btn-nexus-sm d-none d-md-inline-flex">All Deals</a>
+            </div>
+            <div class="row g-3">
+                @foreach (var product in Model.DiscountedProducts)
+                {
+                    @await Html.PartialAsync("_ProductCard", product)
+                }
+            </div>
+        </div>
+    </section>
+}
+
+<!-- New Arrivals -->
+@if (Model.NewArrivals.Any())
+{
+    <section class="section-pad">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-end mb-4">
+                <div>
+                    <span class="section-divider-badge d-inline-block mb-2" style="color:var(--info);border-color:rgba(6,182,212,0.3);background:rgba(6,182,212,0.07);">Just Arrived</span>
+                    <h2 class="section-title mb-1">New <span style="color:var(--info);text-shadow:0 0 20px rgba(6,182,212,0.5);">Arrivals</span></h2>
+                    <p class="section-subtitle">Fresh stock just landed — be the first to grab it</p>
+                </div>
+                <a href="/Shop?sortBy=newest" class="btn-nexus-outline btn-nexus-sm d-none d-md-inline-flex">View All</a>
+            </div>
+            <div class="row g-3">
+                @foreach (var product in Model.NewArrivals)
+                {
+                    @await Html.PartialAsync("_ProductCard", product)
+                }
+            </div>
+        </div>
+    </section>
+}
+
+<!-- Testimonials -->
+<section class="section-pad" style="background:var(--bg-secondary);border-top:1px solid var(--border);">
+    <div class="container">
+        <div class="text-center mb-5">
+            <span class="section-divider-badge d-inline-block mb-2">Community</span>
+            <h2 class="section-title">What Gamers <span class="highlight">Say</span></h2>
+            <p class="section-subtitle">Real reviews from our community</p>
+        </div>
+
+        @if (Model.Testimonials.Any())
+        {
+            <div class="row g-4 mb-5">
+                @foreach (var t in Model.Testimonials)
+                {
+                    <div class="col-md-6 col-lg-3">
+                        <div class="testimonial-card">
+                            <div class="stars mb-2">
+                                @for (int i = 1; i <= 5; i++) { <i class="fas fa-star @(i <= t.Rating ? "filled" : "")"></i> }
+                            </div>
+                            <p class="testimonial-text">"@t.Content"</p>
+                            <div class="testimonial-author">
+                                <div class="author-avatar">@t.AuthorName[0]</div>
+                                <div><p class="author-name">@t.AuthorName</p><p class="author-title">@t.AuthorTitle</p></div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+
+        <!-- Submit Testimonial -->
+        <div style="border-top:1px solid var(--border);padding-top:2.5rem;margin-top:@(Model.Testimonials.Any() ? "0" : "0");">
+            <div class="text-center mb-4">
+                <h3 class="section-title" style="font-size:1.3rem;">Share Your <span class="highlight">Experience</span></h3>
+                <p class="section-subtitle">Had a great experience with NexusGear? We'd love to hear from you.</p>
+            </div>
+
+            @if (TempData["TestimonialMsg"] != null)
+            {
+                <div class="nexus-alert nexus-alert-success mb-4" style="max-width:600px;margin:0 auto 1.5rem;">@TempData["TestimonialMsg"]</div>
+            }
+            @if (TempData["TestimonialError"] != null)
+            {
+                <div class="nexus-alert nexus-alert-error mb-4" style="max-width:600px;margin:0 auto 1.5rem;">@TempData["TestimonialError"]</div>
+            }
+
+            @if (SignInManager.IsSignedIn(User))
+            {
+                <form action="/Testimonial/Submit" method="post" style="max-width:600px;margin:0 auto;" id="testimonialForm">
+                    @Html.AntiForgeryToken()
+                    <div class="glass-card p-4">
+                        <div class="mb-3">
+                            <label class="nexus-label">Your Rating <span style="color:#ef4444;">*</span></label>
+                            <div class="d-flex gap-2" id="testimonialStars">
+                                @for (int s = 1; s <= 5; s++)
+                                {
+                                    <label style="cursor:pointer;font-size:1.5rem;color:var(--text-muted);">
+                                        <input type="radio" name="rating" value="@s" style="display:none;" />
+                                        <i class="fas fa-star" style="transition:color 0.15s;"></i>
+                                    </label>
+                                }
+                            </div>
+                            <div id="testimonialRatingError" style="display:none;color:#ef4444;font-size:0.78rem;margin-top:4px;">Please select a rating.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="nexus-label">Your Title <span style="color:var(--text-muted);font-weight:400;">(optional)</span></label>
+                            <input type="text" name="authorTitle" class="nexus-form-control" placeholder="e.g. Competitive Gamer, PC Builder..." />
+                        </div>
+                        <div class="mb-3">
+                            <label class="nexus-label">Your Experience <span style="color:#ef4444;">*</span></label>
+                            <textarea name="content" class="nexus-form-control" rows="3" required placeholder="Tell us about your experience with NexusGear..."></textarea>
+                        </div>
+                        <button type="submit" class="btn-nexus btn-nexus-sm"><i class="fas fa-paper-plane me-2"></i>Submit Testimonial</button>
+                    </div>
+                </form>
+            }
+            else
+            {
+                <div class="text-center">
+                    <a href="/Account/Login?returnUrl=/" class="btn-nexus btn-nexus-sm"><i class="fas fa-sign-in-alt me-2"></i>Login to Share Your Experience</a>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        // Testimonial star rating
+        const tStars = Array.from(document.querySelectorAll('#testimonialStars label'));
+        tStars.forEach((label, idx) => {
+            label.addEventListener('mouseover', () => {
+                tStars.forEach((l, i) => l.querySelector('i').style.color = i <= idx ? 'var(--accent)' : 'var(--text-muted)');
+            });
+            label.addEventListener('mouseout', () => {
+                const checked = document.querySelector('#testimonialStars input:checked');
+                const ci = checked ? parseInt(checked.value) - 1 : -1;
+                tStars.forEach((l, i) => l.querySelector('i').style.color = i <= ci ? 'var(--accent)' : 'var(--text-muted)');
+            });
+            label.addEventListener('click', () => {
+                label.querySelector('input').checked = true;
+                tStars.forEach((l, i) => l.querySelector('i').style.color = i <= idx ? 'var(--accent)' : 'var(--text-muted)');
+                document.getElementById('testimonialRatingError')?.style.setProperty('display', 'none');
+            });
+        });
+
+        document.getElementById('testimonialForm')?.addEventListener('submit', function(e) {
+            const checked = document.querySelector('#testimonialStars input:checked');
+            if (!checked) {
+                e.preventDefault();
+                const err = document.getElementById('testimonialRatingError');
+                if (err) err.style.display = 'block';
+            }
+        });
+    </script>
+}

@@ -1,0 +1,108 @@
+@model List<NexusGear.Models.Order>
+@{
+    ViewData["Title"] = "Orders";
+    var currentStatus = ViewBag.Status as string;
+    var searchQuery = ViewBag.Q as string;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <p style="color:var(--text-muted);font-size:0.85rem;margin:0;">@Model.Count orders</p>
+</div>
+
+<!-- Filters -->
+<div class="glass-card p-3 mb-4">
+    <form method="get" class="d-flex gap-3 flex-wrap align-items-end">
+        <div>
+            <label class="nexus-label mb-1">Search</label>
+            <input type="text" name="q" value="@searchQuery" class="nexus-form-control" placeholder="Order # or email..." style="width:220px;" />
+        </div>
+        <div>
+            <label class="nexus-label mb-1">Status</label>
+            <select name="status" class="nexus-form-control" style="width:160px;">
+                <option value="">All Statuses</option>
+                @foreach (var s in new[] { "Pending","Confirmed","Processing","Shipped","Delivered","Cancelled","Refunded" })
+                {
+                    if (s == currentStatus)
+                    {
+                        <option value="@s" selected>@s</option>
+                    }
+                    else
+                    {
+                        <option value="@s">@s</option>
+                    }
+                }
+            </select>
+        </div>
+        <button type="submit" class="btn-nexus btn-nexus-sm">Filter</button>
+        @if (!string.IsNullOrEmpty(currentStatus) || !string.IsNullOrEmpty(searchQuery))
+        {
+            <a href="/Admin/Orders" class="btn-nexus-outline btn-nexus-sm">Clear</a>
+        }
+    </form>
+</div>
+
+<div class="glass-card">
+    <div class="table-responsive">
+        <table class="nexus-table">
+            <thead>
+                <tr>
+                    <th>Order #</th>
+                    <th>Customer</th>
+                    <th>Items</th>
+                    <th>Total</th>
+                    <th>Payment</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in Model)
+                {
+                    <tr>
+                        <td><strong style="color:var(--primary);">#@order.Id</strong><br /><span style="font-size:0.72rem;color:var(--text-muted);">@order.OrderNumber</span></td>
+                        <td>
+                            <div style="font-weight:600;color:var(--text-primary);">@order.User?.FirstName @order.User?.LastName</div>
+                            <div style="font-size:0.78rem;color:var(--text-muted);">@order.User?.Email</div>
+                        </td>
+                        <td>@order.OrderItems.Count item(s)</td>
+                        <td><strong style="color:var(--accent);">$@order.Total.ToString("0.00")</strong></td>
+                        <td>
+                            @if (order.PaymentMethod == "card")
+                            {
+                                <span style="font-size:0.75rem;"><i class="fas fa-credit-card me-1" style="color:var(--primary);"></i>Card</span>
+                            }
+                            else
+                            {
+                                <span style="font-size:0.75rem;"><i class="fas fa-money-bill-wave me-1" style="color:var(--success);"></i>COD</span>
+                            }
+                        </td>
+                        <td>
+                            @{
+                                var statusColor = order.Status.ToString() switch {
+                                    "Pending" => "#f59e0b",
+                                    "Confirmed" => "#3b82f6",
+                                    "Processing" => "#8b5cf6",
+                                    "Shipped" => "#06b6d4",
+                                    "Delivered" => "#10b981",
+                                    "Cancelled" => "#ef4444",
+                                    "Refunded" => "#f97316",
+                                    _ => "var(--text-muted)"
+                                };
+                            }
+                            <span style="background:@(statusColor)22;color:@statusColor;font-size:0.7rem;padding:2px 8px;border-radius:20px;font-weight:600;">@order.Status</span>
+                        </td>
+                        <td style="font-size:0.8rem;color:var(--text-muted);">@order.CreatedAt.ToString("MMM dd, yyyy")</td>
+                        <td>
+                            <a href="/Admin/Orders/Detail/@order.Id" class="btn-nexus-outline btn-nexus-sm"><i class="fas fa-eye"></i></a>
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Any())
+                {
+                    <tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:2rem;">No orders found.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

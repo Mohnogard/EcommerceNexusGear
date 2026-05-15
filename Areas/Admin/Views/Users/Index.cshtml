@@ -1,0 +1,105 @@
+@model List<NexusGear.Models.ApplicationUser>
+@{
+    ViewData["Title"] = "Users";
+    var searchQuery = ViewBag.Q as string;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <p style="color:var(--text-muted);font-size:0.85rem;margin:0;">@Model.Count user(s)</p>
+</div>
+
+<!-- Search -->
+<div class="glass-card p-3 mb-4">
+    <form method="get" class="d-flex gap-3 align-items-end">
+        <div>
+            <label class="nexus-label mb-1">Search</label>
+            <input type="text" name="q" value="@searchQuery" class="nexus-form-control" placeholder="Name or email..." style="width:280px;" />
+        </div>
+        <button type="submit" class="btn-nexus btn-nexus-sm">Search</button>
+        @if (!string.IsNullOrEmpty(searchQuery))
+        {
+            <a href="/Admin/Users" class="btn-nexus-outline btn-nexus-sm">Clear</a>
+        }
+    </form>
+</div>
+
+<div class="glass-card">
+    <div class="table-responsive">
+        <table class="nexus-table">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Email</th>
+                    <th>Location</th>
+                    <th>Orders</th>
+                    <th>Joined</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var user in Model)
+                {
+                    var isLocked = user.LockoutEnd.HasValue && user.LockoutEnd.Value > DateTimeOffset.UtcNow;
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                @if (!string.IsNullOrEmpty(user.AvatarUrl))
+                                {
+                                    <img src="@user.AvatarUrl" style="width:36px;height:36px;object-fit:cover;border-radius:50%;border:2px solid var(--primary);" />
+                                }
+                                else
+                                {
+                                    <div style="width:36px;height:36px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff;font-weight:700;">
+                                        @(user.FirstName?.FirstOrDefault().ToString().ToUpper() ?? "?")
+                                    </div>
+                                }
+                                <div>
+                                    <div style="font-weight:600;color:var(--text-primary);">@user.FullName</div>
+                                    <div style="font-size:0.72rem;color:var(--text-muted);">ID: @user.Id[..8]...</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td style="font-size:0.85rem;color:var(--text-muted);">@user.Email</td>
+                        <td style="font-size:0.82rem;color:var(--text-muted);">
+                            @if (!string.IsNullOrEmpty(user.City))
+                            {
+                                <span>@user.City, @user.Country</span>
+                            }
+                            else
+                            {
+                                <span>—</span>
+                            }
+                        </td>
+                        <td>@user.Orders.Count</td>
+                        <td style="font-size:0.78rem;color:var(--text-muted);">@user.CreatedAt.ToString("MMM dd, yyyy")</td>
+                        <td>
+                            @if (isLocked)
+                            {
+                                <span style="background:rgba(239,68,68,0.12);color:var(--danger);font-size:0.7rem;padding:2px 8px;border-radius:20px;font-weight:600;">Locked</span>
+                            }
+                            else
+                            {
+                                <span style="background:rgba(16,185,129,0.12);color:var(--success);font-size:0.7rem;padding:2px 8px;border-radius:20px;font-weight:600;">Active</span>
+                            }
+                        </td>
+                        <td>
+                            <form asp-action="ToggleLock" method="post" class="d-inline"
+                                  onsubmit="return confirm('@(isLocked ? "Unlock this user?" : "Lock this user?")')">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@user.Id" />
+                                <button type="submit" class="@(isLocked ? "btn-nexus btn-nexus-sm" : "btn-danger-nx")" title="@(isLocked ? "Unlock" : "Lock")">
+                                    <i class="fas fa-@(isLocked ? "lock-open" : "lock")"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Any())
+                {
+                    <tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:2rem;">No users found.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

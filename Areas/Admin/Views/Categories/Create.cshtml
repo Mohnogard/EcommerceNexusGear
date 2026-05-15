@@ -1,0 +1,30 @@
+@model NexusGear.Models.Category
+@{
+    ViewData["Title"] = "Add Category";
+}
+
+<div style="max-width:600px;">
+    <a href="/Admin/Categories" class="btn-nexus-outline btn-nexus-sm mb-4"><i class="fas fa-arrow-left me-1"></i>Back</a>
+    <div class="glass-card p-4">
+        <form asp-action="Create" method="post" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+            <div class="row g-3">
+                <div class="col-12"><label class="nexus-label">Name *</label><input asp-for="Name" class="nexus-form-control" /><span asp-validation-for="Name" class="field-validation-error"></span></div>
+                <div class="col-12"><label class="nexus-label">Description</label><textarea asp-for="Description" class="nexus-form-control" rows="2"></textarea></div>
+                <div class="col-md-6"><label class="nexus-label">Slug</label><input asp-for="Slug" class="nexus-form-control" placeholder="auto-generated" /></div>
+                <div class="col-md-6"><label class="nexus-label">Display Order</label><input asp-for="DisplayOrder" type="number" class="nexus-form-control" /></div>
+                <div class="col-12"><label class="nexus-label">Image</label><input type="file" name="image" class="nexus-form-control" accept="image/*" /></div>
+                <div class="col-12">
+                    <div class="form-check">
+                        <input asp-for="IsActive" class="form-check-input" checked />
+                        <label class="form-check-label nexus-label" asp-for="IsActive" style="margin-bottom:0;">Active</label>
+                    </div>
+                </div>
+                <div class="col-12 mt-2">
+                    <button type="submit" class="btn-nexus"><i class="fas fa-save me-2"></i>Create Category</button>
+                    <a href="/Admin/Categories" class="btn-nexus-outline ms-2">Cancel</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,127 @@
+@model NexusGear.ViewModels.UserDashboardViewModel
+@{
+    ViewData["Title"] = "My Dashboard - NexusGear";
+}
+
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <nav aria-label="breadcrumb"><ol class="breadcrumb mb-1"><li class="breadcrumb-item"><a href="/">Home</a></li><li class="breadcrumb-item active">Dashboard</li></ol></nav>
+            <h1 style="font-family:'Orbitron',sans-serif;font-size:1.3rem;font-weight:800;">Welcome back, <span style="background:linear-gradient(135deg,var(--primary),var(--secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">@Model.User.FirstName</span></h1>
+        </div>
+        <a href="/Dashboard/Profile" class="btn-nexus-outline btn-nexus-sm"><i class="fas fa-edit me-1"></i>Edit Profile</a>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="nexus-alert nexus-alert-success mb-4">@TempData["Success"]</div>
+    }
+
+    <!-- Stats -->
+    <div class="row g-3 mb-5">
+        <div class="col-6 col-md-3">
+            <div class="dash-stat-card">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="dash-stat-icon" style="background:rgba(168,85,247,0.12);color:var(--primary);"><i class="fas fa-box"></i></div>
+                    <div><p class="dash-stat-value">@Model.TotalOrders</p><p class="dash-stat-label">Total Orders</p></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="dash-stat-card">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="dash-stat-icon" style="background:rgba(245,158,11,0.12);color:var(--accent);"><i class="fas fa-dollar-sign"></i></div>
+                    <div><p class="dash-stat-value">$@Model.TotalSpent.ToString("0")</p><p class="dash-stat-label">Total Spent</p></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="dash-stat-card">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="dash-stat-icon" style="background:rgba(236,72,153,0.12);color:var(--secondary);"><i class="fas fa-heart"></i></div>
+                    <div><p class="dash-stat-value">@Model.WishlistCount</p><p class="dash-stat-label">Wishlist Items</p></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="dash-stat-card">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="dash-stat-icon" style="background:rgba(16,185,129,0.12);color:var(--success);"><i class="fas fa-shopping-bag"></i></div>
+                    <div><p class="dash-stat-value"><a href="/Shop" class="text-decoration-none" style="color:inherit;">Shop</a></p><p class="dash-stat-label">Continue Shopping</p></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Nav -->
+    <div class="row g-3 mb-5">
+        <div class="col-md-4">
+            <a href="/Dashboard/Orders" class="glass-card p-3 d-flex align-items-center gap-3 text-decoration-none">
+                <div class="dash-stat-icon" style="background:rgba(168,85,247,0.12);color:var(--primary);"><i class="fas fa-box"></i></div>
+                <div><p style="font-weight:700;margin:0;color:var(--text-primary);">My Orders</p><p style="font-size:0.78rem;color:var(--text-muted);margin:0;">View order history</p></div>
+                <i class="fas fa-chevron-right ms-auto" style="color:var(--text-muted);"></i>
+            </a>
+        </div>
+        <div class="col-md-4">
+            <a href="/Dashboard/Wishlist" class="glass-card p-3 d-flex align-items-center gap-3 text-decoration-none">
+                <div class="dash-stat-icon" style="background:rgba(236,72,153,0.12);color:var(--secondary);"><i class="fas fa-heart"></i></div>
+                <div><p style="font-weight:700;margin:0;color:var(--text-primary);">My Wishlist</p><p style="font-size:0.78rem;color:var(--text-muted);margin:0;">Saved items</p></div>
+                <i class="fas fa-chevron-right ms-auto" style="color:var(--text-muted);"></i>
+            </a>
+        </div>
+        <div class="col-md-4">
+            <a href="/Dashboard/Profile" class="glass-card p-3 d-flex align-items-center gap-3 text-decoration-none">
+                <div class="dash-stat-icon" style="background:rgba(6,182,212,0.12);color:var(--info);"><i class="fas fa-user"></i></div>
+                <div><p style="font-weight:700;margin:0;color:var(--text-primary);">Edit Profile</p><p style="font-size:0.78rem;color:var(--text-muted);margin:0;">Update your info</p></div>
+                <i class="fas fa-chevron-right ms-auto" style="color:var(--text-muted);"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- Recent Orders -->
+    @if (Model.RecentOrders.Any())
+    {
+        <div class="glass-card">
+            <div class="d-flex justify-content-between align-items-center p-3" style="border-bottom:1px solid var(--border);">
+                <h3 style="font-family:'Orbitron',sans-serif;font-size:0.88rem;font-weight:700;color:var(--primary-light);margin:0;">Recent Orders</h3>
+                <a href="/Dashboard/Orders" class="btn-nexus-outline btn-nexus-sm">View All</a>
+            </div>
+            <div class="table-responsive">
+                <table class="nexus-table">
+                    <thead>
+                        <tr>
+                            <th>Order #</th>
+                            <th>Date</th>
+                            <th>Items</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var order in Model.RecentOrders)
+                        {
+                            <tr>
+                                <td><strong style="color:var(--text-primary);">@order.OrderNumber</strong></td>
+                                <td>@order.CreatedAt.ToString("MMM d, yyyy")</td>
+                                <td>@order.OrderItems.Count item@(order.OrderItems.Count == 1 ? "" : "s")</td>
+                                <td><strong style="color:var(--accent);font-family:'Orbitron',sans-serif;font-size:0.88rem;">$@order.Total.ToString("0.00")</strong></td>
+                                <td><span class="status-badge status-@order.Status">@order.Status</span></td>
+                                <td><a href="/Dashboard/OrderDetail/@order.Id" class="btn-nexus-outline btn-nexus-sm">View</a></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="empty-state">
+            <i class="fas fa-box-open"></i>
+            <h4>No orders yet</h4>
+            <p>Start shopping to see your orders here</p>
+            <a href="/Shop" class="btn-nexus btn-nexus-sm mt-2">Browse Shop</a>
+        </div>
+    }
+</div>

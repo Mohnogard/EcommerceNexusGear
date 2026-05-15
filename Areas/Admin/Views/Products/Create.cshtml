@@ -1,0 +1,93 @@
+@model NexusGear.Models.Product
+@{
+    ViewData["Title"] = "Add Product";
+}
+
+<div style="max-width:900px;">
+    <a href="/Admin/Products" class="btn-nexus-outline btn-nexus-sm mb-4"><i class="fas fa-arrow-left me-1"></i>Back</a>
+
+    <div class="glass-card p-4">
+        <form asp-action="Create" method="post" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="nexus-alert nexus-alert-danger mb-4">
+                    @foreach (var err in ViewData.ModelState.Values.SelectMany(v => v.Errors)) { <div>@err.ErrorMessage</div> }
+                </div>
+            }
+
+            <div class="row g-3">
+                <div class="col-md-8">
+                    <label class="nexus-label">Product Name *</label>
+                    <input asp-for="Name" class="nexus-form-control" placeholder="Enter product name" />
+                    <span asp-validation-for="Name" class="field-validation-error"></span>
+                </div>
+                <div class="col-md-4">
+                    <label class="nexus-label">Brand</label>
+                    <input asp-for="Brand" class="nexus-form-control" placeholder="Brand name" />
+                </div>
+                <div class="col-md-4">
+                    <label class="nexus-label">Category *</label>
+                    <select asp-for="CategoryId" asp-items="ViewBag.Categories" class="nexus-form-control">
+                        <option value="">Select Category</option>
+                    </select>
+                    <span asp-validation-for="CategoryId" class="field-validation-error"></span>
+                </div>
+                <div class="col-md-4">
+                    <label class="nexus-label">Price *</label>
+                    <input asp-for="Price" type="number" step="0.01" class="nexus-form-control" placeholder="0.00" />
+                    <span asp-validation-for="Price" class="field-validation-error"></span>
+                </div>
+                <div class="col-md-4">
+                    <label class="nexus-label">Discount %</label>
+                    <input asp-for="DiscountPercentage" type="number" step="0.01" class="nexus-form-control" placeholder="0" />
+                </div>
+                <div class="col-md-4">
+                    <label class="nexus-label">Stock Quantity *</label>
+                    <input asp-for="Stock" type="number" class="nexus-form-control" placeholder="0" />
+                </div>
+                <div class="col-md-4">
+                    <label class="nexus-label">SKU</label>
+                    <input asp-for="Sku" class="nexus-form-control" placeholder="NG-XXX000" />
+                </div>
+                <div class="col-md-4">
+                    <label class="nexus-label">Slug (auto-generated if empty)</label>
+                    <input asp-for="Slug" class="nexus-form-control" placeholder="product-url-slug" />
+                </div>
+                <div class="col-12">
+                    <label class="nexus-label">Description</label>
+                    <textarea asp-for="Description" class="nexus-form-control" rows="4" placeholder="Detailed product description..."></textarea>
+                </div>
+                <div class="col-md-6">
+                    <label class="nexus-label">Main Image</label>
+                    <input type="file" name="mainImage" class="nexus-form-control" accept="image/*" />
+                </div>
+                <div class="col-md-6">
+                    <label class="nexus-label">Additional Images</label>
+                    <input type="file" name="additionalImages" class="nexus-form-control" accept="image/*" multiple />
+                </div>
+                <div class="col-12">
+                    <div class="d-flex gap-4 flex-wrap">
+                        <div class="form-check">
+                            <input asp-for="IsActive" class="form-check-input" />
+                            <label class="form-check-label nexus-label" asp-for="IsActive" style="margin-bottom:0;">Active</label>
+                        </div>
+                        <div class="form-check">
+                            <input asp-for="IsFeatured" class="form-check-input" />
+                            <label class="form-check-label nexus-label" asp-for="IsFeatured" style="margin-bottom:0;">Featured</label>
+                        </div>
+                        <div class="form-check">
+                            <input asp-for="IsNewArrival" class="form-check-input" />
+                            <label class="form-check-label nexus-label" asp-for="IsNewArrival" style="margin-bottom:0;">New Arrival</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 mt-2">
+                    <button type="submit" class="btn-nexus"><i class="fas fa-save me-2"></i>Create Product</button>
+                    <a href="/Admin/Products" class="btn-nexus-outline ms-2">Cancel</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

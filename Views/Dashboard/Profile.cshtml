@@ -1,0 +1,33 @@
+@model NexusGear.ViewModels.EditProfileViewModel
+@{
+    ViewData["Title"] = "Edit Profile - NexusGear";
+}
+
+<div class="container py-5" style="max-width:600px;">
+    <nav aria-label="breadcrumb" class="mb-4"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="/">Home</a></li><li class="breadcrumb-item"><a href="/Dashboard">Dashboard</a></li><li class="breadcrumb-item active">Profile</li></ol></nav>
+    <h1 style="font-family:'Orbitron',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:2rem;">Edit Profile</h1>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="nexus-alert nexus-alert-success mb-4">@TempData["Success"]</div>
+    }
+
+    <div class="glass-card p-4">
+        <form asp-action="Profile" method="post">
+            @Html.AntiForgeryToken()
+            <div class="row g-3">
+                <div class="col-6"><label class="nexus-label">First Name *</label><input asp-for="FirstName" class="nexus-form-control" /><span asp-validation-for="FirstName" class="field-validation-error"></span></div>
+                <div class="col-6"><label class="nexus-label">Last Name *</label><input asp-for="LastName" class="nexus-form-control" /><span asp-validation-for="LastName" class="field-validation-error"></span></div>
+                <div class="col-12"><label class="nexus-label">Phone</label><input asp-for="Phone" class="nexus-form-control" placeholder="+1 555 000 0000" /></div>
+                <div class="col-12"><label class="nexus-label">Address</label><input asp-for="Address" class="nexus-form-control" placeholder="Street address" /></div>
+                <div class="col-md-4"><label class="nexus-label">City</label><input asp-for="City" class="nexus-form-control" /></div>
+                <div class="col-md-4"><label class="nexus-label">Country</label><input asp-for="Country" class="nexus-form-control" /></div>
+                <div class="col-md-4"><label class="nexus-label">Postal Code</label><input asp-for="PostalCode" class="nexus-form-control" /></div>
+                <div class="col-12 mt-2">
+                    <button type="submit" class="btn-nexus"><i class="fas fa-save me-2"></i>Save Changes</button>
+                    <a href="/Dashboard" class="btn-nexus-outline ms-2">Cancel</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
