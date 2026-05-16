@@ -19,7 +19,7 @@ namespace NexusGear.Services
                 Amount = (long)(amount * 100),
                 Currency = currency,
                 Description = description ?? "NexusGear Order",
-                AutomaticPaymentMethods = new PaymentIntentAutomaticPaymentMethodsOptions { Enabled = true }
+                PaymentMethodTypes = new List<string> { "card" }
             };
             var service = new PaymentIntentService();
             return await service.CreateAsync(options);

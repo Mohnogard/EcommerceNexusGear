@@ -91,30 +91,120 @@
                         <!-- Card -->
                         <div class="payment-method-option selected" id="opt-card" onclick="selectPayment('card')">
                             <input type="radio" name="PaymentMethod" value="card" id="pm-card" checked />
-                            <div>
+                            <div class="flex-grow-1">
                                 <div class="d-flex align-items-center gap-2">
-                                    <i class="fab fa-cc-visa" style="font-size:1.4rem;color:#1a1aff;"></i>
-                                    <i class="fab fa-cc-mastercard" style="font-size:1.4rem;color:#eb001b;"></i>
+                                    <i class="fab fa-cc-visa" style="font-size:1.5rem;color:#1a1aff;"></i>
+                                    <i class="fab fa-cc-mastercard" style="font-size:1.5rem;color:#eb001b;"></i>
+                                    <i class="fab fa-cc-amex" style="font-size:1.5rem;color:#2e77bc;"></i>
                                     <strong style="font-size:0.9rem;color:var(--text-primary);">Credit / Debit Card</strong>
                                 </div>
-                                <p style="font-size:0.78rem;color:var(--text-muted);margin:0;">Secured by Stripe — 256-bit SSL encryption</p>
+                                <p style="font-size:0.78rem;color:var(--text-muted);margin:0.2rem 0 0;">Secured by Stripe — 256-bit SSL encryption</p>
                             </div>
+                            <i class="fas fa-lock" style="color:var(--primary);opacity:0.6;"></i>
                         </div>
                         <!-- Cash on Delivery -->
                         <div class="payment-method-option" id="opt-cod" onclick="selectPayment('cod')">
                             <input type="radio" name="PaymentMethod" value="cod" id="pm-cod" />
                             <div>
                                 <strong style="font-size:0.9rem;color:var(--text-primary);"><i class="fas fa-money-bill-wave me-2" style="color:var(--success);"></i>Cash on Delivery</strong>
-                                <p style="font-size:0.78rem;color:var(--text-muted);margin:0;">Pay when your order arrives</p>
+                                <p style="font-size:0.78rem;color:var(--text-muted);margin:0.2rem 0 0;">Pay when your order arrives</p>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Stripe Card Element -->
-                    <div id="stripe-panel" class="mt-3">
-                        <label class="nexus-label">Card Details</label>
-                        <div id="stripe-card-element"></div>
-                        <div id="stripe-error" class="nexus-alert nexus-alert-danger mt-2" style="display:none;"></div>
+                    <!-- Stripe Split Card Fields -->
+                    <div id="stripe-panel">
+                        <div class="card-fields-wrap">
+                            <div class="mb-3">
+                                <label class="nexus-label">Card Number</label>
+                                <div class="stripe-field" id="sf-number"><div id="card-number-element"></div></div>
+                            </div>
+                            <div class="row g-3 mb-3">
+                                <div class="col-6">
+                                    <label class="nexus-label">Expiry Date</label>
+                                    <div class="stripe-field" id="sf-expiry"><div id="card-expiry-element"></div></div>
+                                </div>
+                                <div class="col-6">
+                                    <label class="nexus-label">
+                                        Security Code
+                                        <i class="fas fa-question-circle ms-1" style="color:var(--text-muted);font-size:0.72rem;" title="3-digit code on the back of your card (4 digits for Amex)"></i>
+                                    </label>
+                                    <div class="stripe-field" id="sf-cvc"><div id="card-cvc-element"></div></div>
+                                </div>
+                            </div>
+                            <div class="row g-3">
+                                <div class="col-6">
+                                    <label class="nexus-label">Cardholder Name</label>
+                                    <input type="text" id="cardholder-name" class="nexus-form-control" placeholder="Name on card" autocomplete="cc-name" />
+                                </div>
+                                <div class="col-6">
+                                    <label class="nexus-label">Billing Country / Region</label>
+                                    <select id="billing-country" class="nexus-form-control">
+                                        <option value="">Select country…</option>
+                                        <option value="US">United States</option>
+                                        <option value="GB">United Kingdom</option>
+                                        <option value="DE">Germany</option>
+                                        <option value="FR">France</option>
+                                        <option value="NL">Netherlands</option>
+                                        <option value="SE">Sweden</option>
+                                        <option value="NO">Norway</option>
+                                        <option value="DK">Denmark</option>
+                                        <option value="FI">Finland</option>
+                                        <option value="CH">Switzerland</option>
+                                        <option value="AT">Austria</option>
+                                        <option value="BE">Belgium</option>
+                                        <option value="ES">Spain</option>
+                                        <option value="IT">Italy</option>
+                                        <option value="PT">Portugal</option>
+                                        <option value="PL">Poland</option>
+                                        <option value="CA">Canada</option>
+                                        <option value="AU">Australia</option>
+                                        <option value="NZ">New Zealand</option>
+                                        <option value="JP">Japan</option>
+                                        <option value="SG">Singapore</option>
+                                        <option value="HK">Hong Kong</option>
+                                        <option value="MY">Malaysia</option>
+                                        <option value="TH">Thailand</option>
+                                        <option value="ID">Indonesia</option>
+                                        <option value="PH">Philippines</option>
+                                        <option value="IN">India</option>
+                                        <option value="AE">United Arab Emirates</option>
+                                        <option value="SA">Saudi Arabia</option>
+                                        <option value="QA">Qatar</option>
+                                        <option value="KW">Kuwait</option>
+                                        <option value="BH">Bahrain</option>
+                                        <option value="OM">Oman</option>
+                                        <option value="JO">Jordan</option>
+                                        <option value="EG">Egypt</option>
+                                        <option value="ZA">South Africa</option>
+                                        <option value="NG">Nigeria</option>
+                                        <option value="KE">Kenya</option>
+                                        <option value="MA">Morocco</option>
+                                        <option value="BR">Brazil</option>
+                                        <option value="MX">Mexico</option>
+                                        <option value="AR">Argentina</option>
+                                        <option value="CL">Chile</option>
+                                        <option value="CO">Colombia</option>
+                                        <option value="TR">Turkey</option>
+                                        <option value="RU">Russia</option>
+                                        <option value="UA">Ukraine</option>
+                                        <option value="GR">Greece</option>
+                                        <option value="CZ">Czech Republic</option>
+                                        <option value="RO">Romania</option>
+                                        <option value="HU">Hungary</option>
+                                        <option value="PK">Pakistan</option>
+                                        <option value="BD">Bangladesh</option>
+                                        <option value="LK">Sri Lanka</option>
+                                        <option value="KR">South Korea</option>
+                                        <option value="CN">China</option>
+                                        <option value="TW">Taiwan</option>
+                                        <option value="VN">Vietnam</option>
+                                        <option value="IL">Israel</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="stripe-error" class="nexus-alert nexus-alert-danger mt-3" style="display:none;"></div>
                     </div>
 
                     <!-- COD Note -->
@@ -161,91 +251,113 @@
 </div>
 
 @section Scripts {
-    @if (!string.IsNullOrEmpty(stripeKey) && stripeKey != "pk_test_YOUR_STRIPE_PUBLISHABLE_KEY")
-    {
-        <script src="https://js.stripe.com/v3/"></script>
-        <script>
-            const stripe = Stripe('@stripeKey');
-            const elements = stripe.elements();
-            const cardElement = elements.create('card', {
-                style: {
-                    base: {
-                        color: '#f1e8ff',
-                        fontFamily: "'Exo 2', sans-serif",
-                        fontSize: '15px',
-                        '::placeholder': { color: '#7c6a9a' }
-                    },
-                    invalid: { color: '#ef4444' }
-                }
+    <script src="https://js.stripe.com/v3/"></script>
+    <script>
+        const stripe = Stripe('@stripeKey');
+        const elements = stripe.elements();
+
+        const cardStyle = {
+            base: {
+                color: '#f1e8ff',
+                fontFamily: "'Exo 2', sans-serif",
+                fontSize: '15px',
+                '::placeholder': { color: '#7c6a9a' }
+            },
+            invalid: { color: '#ef4444' }
+        };
+
+        const cardNumber  = elements.create('cardNumber',  { style: cardStyle, showIcon: true });
+        const cardExpiry  = elements.create('cardExpiry',  { style: cardStyle });
+        const cardCvc     = elements.create('cardCvc',     { style: cardStyle });
+
+        cardNumber.mount('#card-number-element');
+        cardExpiry.mount('#card-expiry-element');
+        cardCvc.mount('#card-cvc-element');
+
+        function wireField(el, wrapperId) {
+            el.on('focus', () => document.getElementById(wrapperId).classList.add('focused'));
+            el.on('blur',  () => document.getElementById(wrapperId).classList.remove('focused'));
+            el.on('change', e => {
+                const w = document.getElementById(wrapperId);
+                w.classList.toggle('invalid', !!e.error);
+                if (e.error) showStripeError(e.error.message);
+                else if (!e.error) clearStripeError();
             });
-            cardElement.mount('#stripe-card-element');
-            cardElement.on('focus', () => document.getElementById('stripe-card-element').classList.add('focused'));
-            cardElement.on('blur', () => document.getElementById('stripe-card-element').classList.remove('focused'));
+        }
+        wireField(cardNumber, 'sf-number');
+        wireField(cardExpiry, 'sf-expiry');
+        wireField(cardCvc,    'sf-cvc');
 
-            let currentMethod = 'card';
+        function showStripeError(msg) {
+            const el = document.getElementById('stripe-error');
+            el.innerHTML = '<i class="fas fa-exclamation-circle me-2"></i>' + msg;
+            el.style.display = 'block';
+        }
+        function clearStripeError() {
+            const el = document.getElementById('stripe-error');
+            el.style.display = 'none';
+            el.textContent = '';
+        }
 
-            function selectPayment(method) {
-                currentMethod = method;
-                document.getElementById('opt-card').classList.toggle('selected', method === 'card');
-                document.getElementById('opt-cod').classList.toggle('selected', method === 'cod');
-                document.getElementById('stripe-panel').style.display = method === 'card' ? 'block' : 'none';
-                document.getElementById('cod-panel').style.display = method === 'cod' ? 'block' : 'none';
-                document.querySelector('input[name="PaymentMethod"][value="' + method + '"]').checked = true;
-            }
+        const btnLabel = '<i class="fas fa-lock me-2"></i>Place Order — $@Model.Total.ToString("0.00")';
+        let currentMethod = 'card';
 
-            document.getElementById('placeOrderBtn').addEventListener('click', async () => {
-                const btn = document.getElementById('placeOrderBtn');
-                btn.disabled = true;
-                btn.innerHTML = '<span class="nx-spinner me-2"></span>Processing...';
+        function selectPayment(method) {
+            currentMethod = method;
+            document.getElementById('opt-card').classList.toggle('selected', method === 'card');
+            document.getElementById('opt-cod').classList.toggle('selected', method === 'cod');
+            document.getElementById('stripe-panel').style.display = method === 'card' ? 'block' : 'none';
+            document.getElementById('cod-panel').style.display   = method === 'cod'  ? 'block' : 'none';
+            document.querySelector('input[name="PaymentMethod"][value="' + method + '"]').checked = true;
+        }
 
-                if (currentMethod === 'card') {
-                    try {
-                        const res = await fetch('/Checkout/CreatePaymentIntent', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ paymentMethod: 'card' })
-                        });
-                        const { clientSecret, intentId } = await res.json();
-                        const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
-                            payment_method: { card: cardElement }
-                        });
-                        if (error) {
-                            const errEl = document.getElementById('stripe-error');
-                            errEl.textContent = error.message;
-                            errEl.style.display = 'block';
-                            btn.disabled = false;
-                            btn.innerHTML = '<i class="fas fa-lock me-2"></i>Place Order — $@Model.Total.ToString("0.00")';
-                            return;
+        document.getElementById('placeOrderBtn').addEventListener('click', async () => {
+            const btn = document.getElementById('placeOrderBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="nx-spinner me-2"></span>Processing…';
+            clearStripeError();
+
+            if (currentMethod === 'card') {
+                const name    = document.getElementById('cardholder-name').value.trim();
+                const country = document.getElementById('billing-country').value || undefined;
+
+                if (!name) {
+                    showStripeError('Please enter the cardholder name.');
+                    btn.disabled = false; btn.innerHTML = btnLabel; return;
+                }
+
+                let clientSecret, intentId;
+                try {
+                    const res = await fetch('/Checkout/CreatePaymentIntent', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ paymentMethod: 'card' })
+                    });
+                    ({ clientSecret, intentId } = await res.json());
+                } catch {
+                    showStripeError('Could not connect to payment service. Please try again.');
+                    btn.disabled = false; btn.innerHTML = btnLabel; return;
+                }
+
+                const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+                    payment_method: {
+                        card: cardNumber,
+                        billing_details: {
+                            name,
+                            address: { country }
                         }
-                        document.getElementById('stripePaymentIntentId').value = paymentIntent.id;
-                    } catch (e) {
-                        showToast('Payment processing failed. Please try again.', 'error');
-                        btn.disabled = false;
-                        btn.innerHTML = '<i class="fas fa-lock me-2"></i>Place Order — $@Model.Total.ToString("0.00")';
-                        return;
                     }
+                });
+
+                if (error) {
+                    showStripeError(error.message);
+                    btn.disabled = false; btn.innerHTML = btnLabel; return;
                 }
-                document.getElementById('checkoutForm').submit();
-            });
-        </script>
-    }
-    else
-    {
-        <script>
-            // Stripe not configured — submit directly (simulated)
-            function selectPayment(method) {
-                document.getElementById('opt-card').classList.toggle('selected', method === 'card');
-                document.getElementById('opt-cod').classList.toggle('selected', method === 'cod');
-                document.getElementById('stripe-panel').style.display = method === 'card' ? 'block' : 'none';
-                document.getElementById('cod-panel').style.display = method === 'cod' ? 'block' : 'none';
-                document.querySelector('input[name="PaymentMethod"][value="' + method + '"]').checked = true;
+
+                document.getElementById('stripePaymentIntentId').value = paymentIntent.id;
             }
 
-            document.getElementById('placeOrderBtn').addEventListener('click', () => {
-                document.getElementById('checkoutForm').submit();
-            });
-
-            document.getElementById('stripe-panel').innerHTML += '<div class="nexus-alert nexus-alert-info mt-3"><i class="fas fa-info-circle me-1"></i>Stripe not configured. Add your API keys to appsettings.json to enable real payments.</div>';
-        </script>
-    }
+            document.getElementById('checkoutForm').submit();
+        });
+    </script>
 }
