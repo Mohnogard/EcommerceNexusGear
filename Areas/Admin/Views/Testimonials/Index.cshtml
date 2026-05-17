@@ -9,7 +9,6 @@
     <div class="d-flex gap-2">
         <a href="/Admin/Testimonials" class="@(pendingOnly ? "btn-nexus-outline" : "btn-nexus") btn-nexus-sm">All</a>
         <a href="/Admin/Testimonials?pending=true" class="@(pendingOnly ? "btn-nexus" : "btn-nexus-outline") btn-nexus-sm">Pending</a>
-        <a href="/Admin/Testimonials/Create" class="btn-nexus btn-nexus-sm" style="background:var(--success-gradient,linear-gradient(135deg,#10b981,#059669));"><i class="fas fa-plus me-1"></i>Add New</a>
     </div>
 </div>
 
@@ -77,7 +76,6 @@
                                         <button type="submit" class="btn-nexus-outline btn-nexus-sm" title="Deactivate"><i class="fas fa-eye-slash"></i></button>
                                     </form>
                                 }
-                                <a href="/Admin/Testimonials/Edit/@t.Id" class="btn-nexus-outline btn-nexus-sm" title="Edit"><i class="fas fa-edit"></i></a>
                                 <form asp-action="Delete" method="post" class="d-inline" onsubmit="return confirm('Delete this testimonial?')">
                                     @Html.AntiForgeryToken()
                                     <input type="hidden" name="id" value="@t.Id" />

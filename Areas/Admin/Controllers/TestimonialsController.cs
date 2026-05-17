@@ -25,49 +25,7 @@ namespace NexusGear.Areas.Admin.Controllers
             return View(await query.OrderByDescending(t => t.CreatedAt).ToListAsync());
         }
 
-        [HttpGet]
-        public IActionResult Create() => View(new Testimonial());
-
-        [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Testimonial model)
-        {
-            if (!ModelState.IsValid) return View(model);
-
-            model.CreatedAt = DateTime.UtcNow;
-            _context.Testimonials.Add(model);
-            await _context.SaveChangesAsync();
-            TempData["Success"] = "Testimonial created successfully.";
-            return RedirectToAction("Index");
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> Edit(int id)
-        {
-            var t = await _context.Testimonials.FindAsync(id);
-            if (t == null) return NotFound();
-            return View(t);
-        }
-
-        [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Testimonial model)
-        {
-            if (id != model.Id) return NotFound();
-            if (!ModelState.IsValid) return View(model);
-
-            var existing = await _context.Testimonials.FindAsync(id);
-            if (existing == null) return NotFound();
-
-            existing.AuthorName = model.AuthorName;
-            existing.AuthorTitle = model.AuthorTitle;
-            existing.AuthorAvatarUrl = model.AuthorAvatarUrl;
-            existing.Content = model.Content;
-            existing.Rating = Math.Clamp(model.Rating, 1, 5);
-            existing.IsActive = model.IsActive;
-
-            await _context.SaveChangesAsync();
-            TempData["Success"] = "Testimonial updated.";
-            return RedirectToAction("Index");
-        }
+       
 
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Approve(int id)
