@@ -12,7 +12,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" />
     <link rel="stylesheet" href="~/css/nexus.css" />
+    <style>.has-dropdown:hover .fa-chevron-down{transform:rotate(180deg);}</style>
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
@@ -60,6 +62,12 @@
                 <ul class="navbar-nav flex-row gap-1 d-none d-lg-flex mb-0">
                     <li><a class="nav-link-nx @(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" ? "active" : "")" href="/">Home</a></li>
                     <li><a class="nav-link-nx @(ViewContext.RouteData.Values["controller"]?.ToString() == "Shop" ? "active" : "")" href="/Shop">Shop</a></li>
+                    <li class="has-dropdown">
+                        <a class="nav-link-nx" href="/Shop" style="display:inline-flex;align-items:center;gap:5px;">
+                            Categories <i class="fas fa-chevron-down" style="font-size:0.6rem;opacity:0.65;transition:transform 0.2s;"></i>
+                        </a>
+                        @await Component.InvokeAsync("NavCategories")
+                    </li>
                     <li><a class="nav-link-nx" href="/Shop?onlyDiscounted=true">Deals</a></li>
                     <li><a class="nav-link-nx" href="/Shop?sortBy=newest">New Arrivals</a></li>
                 </ul>
@@ -111,8 +119,6 @@
         </div>
     </nav>
 
-    <!-- Toast Container -->
-    <div class="toast-container" id="toastContainer"></div>
     @Html.AntiForgeryToken()
 
     <main>
@@ -169,12 +175,31 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="~/js/nexus.js"></script>
     <script>
         document.getElementById('mobileMenuToggle')?.addEventListener('click', function() {
             var m = document.getElementById('mobileMenu');
             if (m) m.style.display = (m.style.display === 'none' || !m.style.display) ? 'block' : 'none';
         });
+    </script>
+    <script>
+        // Newsletter subscribe (footer)
+        document.querySelector('.nexus-footer .btn-nexus')?.addEventListener('click', function () {
+            const input = this.closest('.input-group')?.querySelector('input[type="email"]');
+            if (!input || !input.value.trim()) {
+                showToast('Please enter a valid email address.', 'warning'); return;
+            }
+            showToast('You\'re subscribed! Welcome to the NexusGear community.', 'success');
+            input.value = '';
+        });
+
+        @if (TempData["Success"] != null) {
+            <text>document.addEventListener('DOMContentLoaded',()=>showToast('@Html.Raw(Html.Encode(TempData["Success"]!.ToString()))', 'success'));</text>
+        }
+        @if (TempData["Error"] != null) {
+            <text>document.addEventListener('DOMContentLoaded',()=>showToast('@Html.Raw(Html.Encode(TempData["Error"]!.ToString()))', 'error'));</text>
+        }
     </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>

@@ -4,7 +4,22 @@
 }
 
 <div class="container py-5" style="max-width:900px;">
-    <nav aria-label="breadcrumb" class="mb-4">
+    <!-- Print-only invoice header -->
+    <div class="print-only">
+        <div class="print-invoice-header">
+            <div>
+                <div class="brand-print">NEXUSGEAR</div>
+                <div style="font-size:0.8rem;color:#666;margin-top:2px;">Your Gaming Gear Destination</div>
+            </div>
+            <div style="text-align:right;">
+                <div style="font-size:1rem;font-weight:700;color:#111;">INVOICE</div>
+                <div style="font-size:0.8rem;color:#666;">Order #@Model.OrderNumber</div>
+                <div style="font-size:0.8rem;color:#666;">Date: @Model.CreatedAt.ToString("MMMM d, yyyy")</div>
+            </div>
+        </div>
+    </div>
+
+    <nav aria-label="breadcrumb" class="mb-4 no-print">
         <ol class="breadcrumb"><li class="breadcrumb-item"><a href="/">Home</a></li><li class="breadcrumb-item"><a href="/Dashboard">Dashboard</a></li><li class="breadcrumb-item"><a href="/Dashboard/Orders">Orders</a></li><li class="breadcrumb-item active">@Model.OrderNumber</li></ol>
     </nav>
 
@@ -46,5 +61,10 @@
         <p style="color:var(--text-secondary);margin:0;line-height:1.7;">@Model.ShippingAddress, @Model.ShippingCity, @Model.ShippingCountry @Model.ShippingPostalCode</p>
     </div>
 
-    <a href="/Dashboard/Orders" class="btn-nexus-outline btn-nexus-sm"><i class="fas fa-arrow-left me-1"></i>Back to Orders</a>
+    <div class="d-flex gap-3 flex-wrap">
+        <a href="/Dashboard/Orders" class="btn-nexus-outline btn-nexus-sm no-print"><i class="fas fa-arrow-left me-1"></i>Back to Orders</a>
+        <button onclick="window.print()" class="btn-nexus btn-nexus-sm no-print" style="background:linear-gradient(135deg,#7c22d4,#be185d);">
+            <i class="fas fa-print me-2"></i>Print Invoice
+        </button>
+    </div>
 </div>

@@ -50,7 +50,7 @@ namespace NexusGear.Controllers
                 Testimonials = await _context.Testimonials
                     .Where(t => t.IsActive)
                     .OrderByDescending(t => t.CreatedAt)
-                    .Take(4)
+                    .Take(20)
                     .ToListAsync()
             };
             return View(vm);

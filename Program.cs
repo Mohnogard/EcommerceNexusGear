@@ -32,6 +32,31 @@ builder.Services.ConfigureApplicationCookie(options =>
 });
 
 builder.Services.AddScoped<StripeService>();
+
+// External OAuth providers — keys go in appsettings.Development.json
+var googleId = builder.Configuration["Authentication:Google:ClientId"];
+var googleSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+var fbId = builder.Configuration["Authentication:Facebook:AppId"];
+var fbSecret = builder.Configuration["Authentication:Facebook:AppSecret"];
+
+if (!string.IsNullOrWhiteSpace(googleId) && googleId != "YOUR_GOOGLE_CLIENT_ID")
+{
+    builder.Services.AddAuthentication().AddGoogle(o =>
+    {
+        o.ClientId = googleId;
+        o.ClientSecret = googleSecret!;
+    });
+}
+
+if (!string.IsNullOrWhiteSpace(fbId) && fbId != "YOUR_FACEBOOK_APP_ID")
+{
+    builder.Services.AddAuthentication().AddFacebook(o =>
+    {
+        o.AppId = fbId;
+        o.AppSecret = fbSecret!;
+    });
+}
+
 builder.Services.AddControllersWithViews();
 builder.Services.AddSession(options =>
 {

@@ -1,0 +1,37 @@
+@model List<NexusGear.Models.Category>
+@if (Model.Any())
+{
+    bool showImages = Model.Count <= 6;
+    <div class="nav-dropdown">
+        <div class="nav-dropdown-header">
+            <span>Shop by Category</span>
+            <a href="/Shop" class="nav-dropdown-viewall">View All &rarr;</a>
+        </div>
+
+        @if (showImages)
+        {
+            <div class="nav-dropdown-grid">
+                @foreach (var cat in Model)
+                {
+                    <a href="/Shop?categoryId=@cat.Id" class="nav-dropdown-cat">
+                        <img src="@(cat.ImageUrl ?? $"https://placehold.co/72x52/150020/a855f7?text={Uri.EscapeDataString(cat.Name)}")"
+                             alt="@cat.Name"
+                             onerror="this.src='https://placehold.co/72x52/150020/a855f7?text=@Uri.EscapeDataString(cat.Name)'" />
+                        <span class="nav-dropdown-cat-name">@cat.Name</span>
+                    </a>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="nav-dropdown-list">
+                @foreach (var cat in Model)
+                {
+                    <a href="/Shop?categoryId=@cat.Id" class="nav-dropdown-list-link">
+                        <i class="fas fa-circle"></i>@cat.Name
+                    </a>
+                }
+            </div>
+        }
+    </div>
+}

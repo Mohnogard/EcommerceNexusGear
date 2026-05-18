@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using NexusGear.Data;
 using NexusGear.Models;
 using NexusGear.ViewModels;
+using System.Security.Claims;
 using System.Text.Json;
 
 namespace NexusGear.Controllers
@@ -99,6 +100,82 @@ namespace NexusGear.Controllers
         }
 
         public IActionResult AccessDenied() => View();
+
+        // ── External (OAuth) login ─────────────────────────────────
+        [HttpPost, ValidateAntiForgeryToken]
+        public IActionResult ExternalLogin(string provider, string? returnUrl = null)
+        {
+            var redirectUrl = Url.Action(nameof(ExternalLoginCallback), "Account", new { returnUrl });
+            var props = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
+            return Challenge(props, provider);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ExternalLoginCallback(string? returnUrl = null, string? remoteError = null)
+        {
+            if (remoteError != null)
+            {
+                TempData["Error"] = $"Error from external provider: {remoteError}";
+                return RedirectToAction(nameof(Login));
+            }
+
+            var info = await _signInManager.GetExternalLoginInfoAsync();
+            if (info == null)
+            {
+                TempData["Error"] = "Could not load external login information.";
+                return RedirectToAction(nameof(Login));
+            }
+
+            // Try sign in with existing external login link
+            var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: true, bypassTwoFactor: true);
+            if (result.Succeeded)
+            {
+                var existingUser = await _userManager.FindByLoginAsync(info.LoginProvider, info.ProviderKey);
+                await MergeGuestCartAsync(existingUser?.Id);
+                return LocalRedirect(returnUrl ?? "/");
+            }
+
+            // Get email from claims
+            var email = info.Principal.FindFirstValue(System.Security.Claims.ClaimTypes.Email);
+            if (email == null)
+            {
+                TempData["Error"] = "Could not retrieve your email from the external provider.";
+                return RedirectToAction(nameof(Login));
+            }
+
+            // Try to find user by email and link the provider
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                // Create new user from external provider info
+                var firstName = info.Principal.FindFirstValue(System.Security.Claims.ClaimTypes.GivenName) ?? email.Split('@')[0];
+                var lastName  = info.Principal.FindFirstValue(System.Security.Claims.ClaimTypes.Surname)  ?? "";
+
+                user = new ApplicationUser
+                {
+                    UserName       = email,
+                    Email          = email,
+                    FirstName      = firstName,
+                    LastName       = lastName,
+                    EmailConfirmed = true
+                };
+
+                var createResult = await _userManager.CreateAsync(user);
+                if (!createResult.Succeeded)
+                {
+                    TempData["Error"] = string.Join("; ", createResult.Errors.Select(e => e.Description));
+                    return RedirectToAction(nameof(Login));
+                }
+
+                await _userManager.AddToRoleAsync(user, "Customer");
+            }
+
+            await _userManager.AddLoginAsync(user, info);
+            await _signInManager.SignInAsync(user, isPersistent: true);
+            await MergeGuestCartAsync(user.Id);
+            TempData["Success"] = $"Welcome, {user.FirstName}! You are now signed in.";
+            return LocalRedirect(returnUrl ?? "/");
+        }
 
         private async Task MergeGuestCartAsync(string? userId)
         {
