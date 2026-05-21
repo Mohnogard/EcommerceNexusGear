@@ -76,7 +76,10 @@
                                         <button type="submit" class="btn-nexus-outline btn-nexus-sm" title="Deactivate"><i class="fas fa-eye-slash"></i></button>
                                     </form>
                                 }
-                                <form asp-action="Delete" method="post" class="d-inline" onsubmit="return confirm('Delete this testimonial?')">
+                                <form asp-action="Delete" method="post" class="d-inline"
+                                      data-confirm="This testimonial will be permanently deleted."
+                                      data-confirm-title="Delete Testimonial?"
+                                      data-confirm-btn="Yes, delete">
                                     @Html.AntiForgeryToken()
                                     <input type="hidden" name="id" value="@t.Id" />
                                     <button type="submit" class="btn-danger-nx" title="Delete"><i class="fas fa-trash"></i></button>

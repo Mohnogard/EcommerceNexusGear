@@ -7,11 +7,6 @@
     <nav aria-label="breadcrumb" class="mb-4"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="/">Home</a></li><li class="breadcrumb-item"><a href="/Dashboard">Dashboard</a></li><li class="breadcrumb-item active">Profile</li></ol></nav>
     <h1 style="font-family:'Orbitron',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:2rem;">Edit Profile</h1>
 
-    @if (TempData["Success"] != null)
-    {
-        <div class="nexus-alert nexus-alert-success mb-4">@TempData["Success"]</div>
-    }
-
     <div class="glass-card p-4">
         <form asp-action="Profile" method="post">
             @Html.AntiForgeryToken()

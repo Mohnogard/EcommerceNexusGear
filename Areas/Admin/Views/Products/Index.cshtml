@@ -70,7 +70,10 @@
                         <td>
                             <div class="d-flex gap-1">
                                 <a href="/Admin/Products/Edit/@p.Id" class="btn-nexus-outline btn-nexus-sm"><i class="fas fa-edit"></i></a>
-                                <form asp-action="Delete" method="post" class="d-inline" onsubmit="return confirm('Remove this product?')">
+                                <form asp-action="Delete" method="post" class="d-inline"
+                                      data-confirm="This product and all its data will be permanently removed."
+                                      data-confirm-title="Delete Product?"
+                                      data-confirm-btn="Yes, delete">
                                     @Html.AntiForgeryToken()
                                     <input type="hidden" name="id" value="@p.Id" />
                                     <button type="submit" class="btn-danger-nx"><i class="fas fa-trash"></i></button>

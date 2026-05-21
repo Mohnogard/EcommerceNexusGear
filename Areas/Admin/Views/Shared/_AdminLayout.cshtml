@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <link rel="stylesheet" href="~/css/nexus.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" />
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
@@ -72,28 +73,50 @@
             <h1 style="font-family:'Orbitron',sans-serif;font-size:0.9rem;font-weight:700;margin:0;color:var(--text-primary);">@ViewData["Title"]</h1>
         </div>
         <div class="d-flex align-items-center gap-3">
-            @if (TempData["Success"] != null)
-            {
-                <span style="font-size:0.82rem;color:var(--success);">@TempData["Success"]</span>
-            }
             <span style="font-size:0.82rem;color:var(--text-muted);">@currentUser?.FirstName @currentUser?.LastName</span>
         </div>
     </div>
 
     <!-- Main Content -->
     <main class="admin-main">
-        @if (TempData["Success"] != null)
-        {
-            <div class="nexus-alert nexus-alert-success mb-4">@TempData["Success"]</div>
-        }
         @RenderBody()
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="~/js/nexus.js"></script>
     <script>
         document.getElementById('sidebarToggle')?.addEventListener('click', () => {
             document.getElementById('adminSidebar')?.classList.toggle('open');
+        });
+        document.addEventListener('DOMContentLoaded', () => {
+            @if (TempData["Success"] != null) {
+                <text>showToast('@Html.Raw(Html.Encode(TempData["Success"]!.ToString()))', 'success');</text>
+            }
+            @if (TempData["Error"] != null) {
+                <text>showToast('@Html.Raw(Html.Encode(TempData["Error"]!.ToString()))', 'error');</text>
+            }
+            document.querySelectorAll('form[data-confirm]').forEach(form => {
+                form.addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    const self = this;
+                    Swal.fire({
+                        title: this.dataset.confirmTitle || 'Are you sure?',
+                        text: this.dataset.confirm,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: this.dataset.confirmBtn || 'Yes, proceed',
+                        cancelButtonText: 'Cancel',
+                        background: '#150020',
+                        color: '#f1e8ff',
+                        confirmButtonColor: this.dataset.confirmColor || '#ef4444',
+                        cancelButtonColor: '#7c22d4',
+                        iconColor: '#f59e0b',
+                    }).then(result => {
+                        if (result.isConfirmed) HTMLFormElement.prototype.submit.call(self);
+                    });
+                });
+            });
         });
     </script>
     @await RenderSectionAsync("Scripts", required: false)

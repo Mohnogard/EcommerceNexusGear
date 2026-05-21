@@ -73,7 +73,7 @@
         <!-- Update Status -->
         <div class="glass-card p-4">
             <h6 style="color:var(--primary);margin-bottom:1rem;font-family:'Orbitron',sans-serif;font-size:0.85rem;letter-spacing:1px;">UPDATE STATUS</h6>
-            <form asp-action="UpdateStatus" method="post" class="d-flex gap-3 align-items-end flex-wrap">
+            <form id="statusUpdateForm" asp-action="UpdateStatus" method="post" class="d-flex gap-3 align-items-end flex-wrap">
                 @Html.AntiForgeryToken()
                 <input type="hidden" name="id" value="@Model.Id" />
                 <div>
@@ -177,3 +177,28 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+<script>
+    document.getElementById('statusUpdateForm')?.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const self = this;
+        const newStatus = this.querySelector('select[name="status"]').value;
+        Swal.fire({
+            title: 'Update Order Status?',
+            html: `Change status to <strong>${newStatus}</strong>?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, update',
+            cancelButtonText: 'Cancel',
+            background: '#150020',
+            color: '#f1e8ff',
+            confirmButtonColor: '#7c22d4',
+            cancelButtonColor: '#4b5563',
+            iconColor: '#a855f7',
+        }).then(result => {
+            if (result.isConfirmed) HTMLFormElement.prototype.submit.call(self);
+        });
+    });
+</script>
+}

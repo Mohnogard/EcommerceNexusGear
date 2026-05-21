@@ -37,7 +37,10 @@
                         <td>
                             <div class="d-flex gap-1">
                                 <a href="/Admin/Categories/Edit/@cat.Id" class="btn-nexus-outline btn-nexus-sm"><i class="fas fa-edit"></i></a>
-                                <form asp-action="Delete" method="post" class="d-inline" onsubmit="return confirm('Remove this category?')">
+                                <form asp-action="Delete" method="post" class="d-inline"
+                                      data-confirm="This will permanently remove the category and cannot be undone."
+                                      data-confirm-title="Delete Category?"
+                                      data-confirm-btn="Yes, delete">
                                     @Html.AntiForgeryToken()
                                     <input type="hidden" name="id" value="@cat.Id" />
                                     <button type="submit" class="btn-danger-nx"><i class="fas fa-trash"></i></button>

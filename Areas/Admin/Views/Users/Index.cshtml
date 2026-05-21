@@ -85,7 +85,10 @@
                         </td>
                         <td>
                             <form asp-action="ToggleLock" method="post" class="d-inline"
-                                  onsubmit="return confirm('@(isLocked ? "Unlock this user?" : "Lock this user?")')">
+                                  data-confirm="@(isLocked ? "This user will be unlocked and regain full access to their account." : "This user will be locked and lose access to their account.")"
+                                  data-confirm-title="@(isLocked ? "Unlock User?" : "Lock User?")"
+                                  data-confirm-btn="@(isLocked ? "Yes, unlock" : "Yes, lock")"
+                                  data-confirm-color="@(isLocked ? "#10b981" : "#ef4444")">
                                 @Html.AntiForgeryToken()
                                 <input type="hidden" name="id" value="@user.Id" />
                                 <button type="submit" class="@(isLocked ? "btn-nexus btn-nexus-sm" : "btn-danger-nx")" title="@(isLocked ? "Unlock" : "Lock")">

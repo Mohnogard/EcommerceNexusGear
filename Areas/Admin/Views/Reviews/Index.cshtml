@@ -74,7 +74,10 @@
                                         <button type="submit" class="btn-nexus btn-nexus-sm" title="Approve"><i class="fas fa-check"></i></button>
                                     </form>
                                 }
-                                <form asp-action="Delete" method="post" class="d-inline" onsubmit="return confirm('Delete this review?')">
+                                <form asp-action="Delete" method="post" class="d-inline"
+                                      data-confirm="This review will be permanently deleted."
+                                      data-confirm-title="Delete Review?"
+                                      data-confirm-btn="Yes, delete">
                                     @Html.AntiForgeryToken()
                                     <input type="hidden" name="id" value="@review.Id" />
                                     <button type="submit" class="btn-danger-nx" title="Delete"><i class="fas fa-trash"></i></button>
