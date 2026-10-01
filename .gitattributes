@@ -1,0 +1,8 @@
+   # Third-party libraries: exclude from GitHub language stats
+   wwwroot/lib/** linguist-vendored
+
+   # Auto-generated EF Core migrations: exclude from stats and collapse in diffs
+   Migrations/** linguist-generated
+
+   # Normalize line endings
+   * text=auto
